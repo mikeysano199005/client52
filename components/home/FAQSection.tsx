@@ -48,10 +48,10 @@ export default function FAQSection() {
         {FAQS.map((faq, i) => (
           <motion.div
             key={i}
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 8 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: i * 0.05 }}
+            viewport={{ once: true, margin: '-30px' }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
             className="glass rounded-xl overflow-hidden"
           >
             <button

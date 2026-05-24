@@ -62,7 +62,7 @@ export default function ProductCard({ plan, compact = false }: ProductCardProps)
     >
       <Link href={`/product/${plan.id}`} className="block group">
         <div
-          className={`glass glass-hover rounded-xl overflow-hidden relative ${
+          className={`glass rounded-xl overflow-hidden relative ${
             compact ? 'p-0' : 'p-0'
           }`}
         >

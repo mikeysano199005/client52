@@ -1,6 +1,5 @@
 'use client'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 import type { Plan } from '@/types'
 import ProductCard, { ProductCardSkeleton } from '@/components/product/ProductCard'
@@ -30,15 +29,10 @@ export default function TopSellers({ plans, loading }: TopSellersProps) {
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
         {loading
           ? Array.from({ length: 6 }).map((_, i) => <ProductCardSkeleton key={i} />)
-          : plans.slice(0, 6).map((plan, i) => (
-              <motion.div
-                key={plan.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.07 }}
-              >
+          : plans.slice(0, 6).map((plan) => (
+              <div key={plan.id}>
                 <ProductCard plan={plan} />
-              </motion.div>
+              </div>
             ))}
       </div>
     </section>

@@ -1,6 +1,5 @@
 'use client'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
 import { Tv, Gamepad2, Wifi, Zap, Star, Package2, Key, LayoutGrid } from 'lucide-react'
 
 const CATEGORIES = [
@@ -74,12 +73,9 @@ export default function CategoryRow() {
   return (
     <section className="mt-10">
       <div className="flex items-center gap-4 overflow-x-auto no-scrollbar pb-2">
-        {CATEGORIES.map((cat, i) => (
-          <motion.div
+        {CATEGORIES.map((cat) => (
+          <div
             key={cat.slug}
-            initial={{ opacity: 0, scale: 0.85 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: i * 0.06, type: 'spring', stiffness: 260, damping: 20 }}
             className="shrink-0"
           >
             <Link
@@ -105,7 +101,7 @@ export default function CategoryRow() {
                 {cat.label}
               </span>
             </Link>
-          </motion.div>
+          </div>
         ))}
       </div>
     </section>
