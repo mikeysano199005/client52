@@ -47,12 +47,14 @@ export async function POST(req: Request) {
 
     if (error) return Response.json({ error: error.message }, { status: 500 })
 
-    // Notify admin in notifications table
-    await supabaseAdmin.from('notifications').insert({
-      type: 'wallet_topup',
-      message: `${user.name} requested wallet top-up of ₹${amount}`,
-      data: { topup_id: data.id, user_id: user.id, amount },
-    }).catch(() => null)
+    // Notify admin in notifications table (best-effort)
+    try {
+      await supabaseAdmin.from('notifications').insert({
+        type: 'wallet_topup',
+        message: `${user.name} requested wallet top-up of ₹${amount}`,
+        data: { topup_id: data.id, user_id: user.id, amount },
+      })
+    } catch { /* ignore */ }
 
     return Response.json({ success: true, topup: data })
   } catch (err) {
