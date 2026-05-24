@@ -78,12 +78,12 @@ export default async function HomePage() {
                         src={getPlanLogo(plan.name, plan.image_url)!}
                         alt={plan.name}
                         className="w-3/4 max-h-14 object-contain drop-shadow-lg"
-                        onError={(e) => { const t = e.target as HTMLImageElement; t.style.display='none'; (t.nextElementSibling as HTMLElement)?.classList.remove('hidden') }}
                       />
-                    ) : null}
-                    <div className={`w-12 h-12 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-xl font-black text-white ${getPlanLogo(plan.name, plan.image_url) ? 'hidden' : ''}`}>
-                      {plan.name[0]}
-                    </div>
+                    ) : (
+                      <div className="w-12 h-12 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-xl font-black text-white">
+                        {plan.name[0]}
+                      </div>
+                    )}
                     {plan.badge && (
                       <span className="absolute top-2 left-2 text-[9px] font-bold text-white bg-purple-600 px-1.5 py-0.5 rounded-full">
                         {plan.badge}
