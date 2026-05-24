@@ -39,7 +39,7 @@ export default function Footer() {
               <SocialLink href="#" icon={<Globe className="w-4 h-4" />} />
               <SocialLink href="#" icon={<Share2 className="w-4 h-4" />} />
               <SocialLink href="#" icon={<Play className="w-4 h-4" />} />
-              <SocialLink href="https://t.me/ottsupport" icon={<Send className="w-4 h-4" />} />
+              <SocialLink href="https://t.me/xudri" icon={<Send className="w-4 h-4" />} />
               <SocialLink href="https://wa.me/919999999999" icon={<MessageCircle className="w-4 h-4" />} />
             </div>
           </div>

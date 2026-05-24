@@ -55,7 +55,7 @@ export default function AdminSettingsPage() {
       icon: <MessageCircle className="w-4 h-4 text-green-400" />,
       fields: [
         { key: 'whatsapp_number', label: 'WhatsApp Number (with country code, no +)', placeholder: '919999999999' },
-        { key: 'telegram_username', label: 'Telegram Username (without @)', placeholder: 'ottsupport' },
+        { key: 'telegram_username', label: 'Telegram Username (without @)', placeholder: 'xudri' },
         { key: 'telegram_bot_token', label: 'Telegram Bot Token (for notifications)', placeholder: '1234567890:ABCDEF...' },
         { key: 'telegram_admin_chat_id', label: 'Telegram Admin Chat ID', placeholder: '-1001234567890' },
       ],

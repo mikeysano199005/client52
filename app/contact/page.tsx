@@ -52,7 +52,7 @@ export default async function ContactPage() {
           </a>
 
           <a
-            href={`https://t.me/${s.telegram_username || 'ottsupport'}`}
+            href={`https://t.me/${s.telegram_username || 'xudri'}`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-4 p-5 bg-[#229ED9]/10 hover:bg-[#229ED9]/20 border border-[#229ED9]/30 rounded-2xl transition-all group"

@@ -10,7 +10,7 @@ interface FloatingButtonsProps {
 
 export default function FloatingButtons({
   whatsappNumber = '919999999999',
-  telegramUsername = 'ottsupport',
+  telegramUsername = 'xudri',
 }: FloatingButtonsProps) {
   const [open, setOpen] = useState(false)
   const [showScroll, setShowScroll] = useState(false)
