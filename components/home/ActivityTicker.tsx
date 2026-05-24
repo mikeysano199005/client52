@@ -111,28 +111,26 @@ export default function ActivityTicker() {
 
   if (entries.length === 0) return null
 
-  // Duplicate for seamless loop
-  const doubled = [...entries, ...entries]
+  // Only take 20 entries max to keep DOM light, duplicate for seamless loop
+  const slice = entries.slice(0, 20)
+  const doubled = [...slice, ...slice]
 
   return (
-    <div className="w-full overflow-hidden bg-black/40 border-b border-white/5 py-2 select-none">
+    <div className="w-full overflow-hidden bg-zinc-950/80 border-y border-white/5 py-2 select-none" style={{ contain: 'strict', height: '32px' }}>
       <div
-        ref={trackRef}
-        className="ticker-track flex items-center gap-0 whitespace-nowrap"
-        style={{ animation: `ticker-scroll ${entries.length * 4}s linear infinite` }}
+        className="ticker-track flex items-center whitespace-nowrap"
+        style={{ animation: 'ticker-scroll 60s linear infinite', willChange: 'transform', transform: 'translateZ(0)', backfaceVisibility: 'hidden' }}
       >
         {doubled.map((e, i) => (
-          <span key={i} className="inline-flex items-center gap-1.5 px-5 text-xs text-zinc-300 shrink-0">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-400 shrink-0 animate-pulse" />
+          <span key={i} className="inline-flex items-center gap-1.5 px-4 text-[11px] text-zinc-400 shrink-0">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-400 shrink-0" />
             <span className="text-white font-medium">{e.name}</span>
-            <span className="text-zinc-500">from</span>
-            <span className="text-purple-400 font-medium">{e.city}</span>
-            <span className="text-zinc-500">bought</span>
-            <span className="text-white font-medium">{e.plan}</span>
-            <span className="text-zinc-400">{e.variant}</span>
-            <span className="text-zinc-600">•</span>
-            <span className="text-zinc-500">{e.time}</span>
-            <span className="text-zinc-700 ml-3">|</span>
+            <span>from</span>
+            <span className="text-purple-400">{e.city}</span>
+            <span>bought</span>
+            <span className="text-white">{e.plan}</span>
+            <span className="text-zinc-500">{e.variant}</span>
+            <span className="text-zinc-600 mx-2">·</span>
           </span>
         ))}
       </div>
