@@ -239,7 +239,7 @@ export default function AdminStockPage() {
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}
-              className="glass border border-white/10 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
+              className="bg-[#111113] border border-white/10 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
             >
               <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
                 <h2 className="font-bold text-white">Add Accounts</h2>

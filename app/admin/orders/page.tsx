@@ -167,7 +167,7 @@ export default function AdminOrdersPage() {
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className="glass border border-white/10 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
+              className="bg-[#111113] border border-white/10 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
             >
               <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
                 <h2 className="font-bold text-white">Order #{selected.order_number}</h2>

@@ -126,7 +126,7 @@ export default function AdminCouponsPage() {
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className="glass border border-white/10 rounded-2xl w-full max-w-md p-6"
+              className="bg-[#111113] border border-white/10 rounded-2xl w-full max-w-md p-6"
             >
               <div className="flex items-center justify-between mb-5">
                 <h2 className="font-bold text-white">Create Coupon</h2>

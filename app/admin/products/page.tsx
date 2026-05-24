@@ -285,7 +285,7 @@ export default function AdminProductsPage() {
       {showModal && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
           <div className="glass rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 sticky top-0 bg-zinc-950/90">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 sticky top-0 bg-[#111113]">
               <h2 className="font-bold text-white">{editingPlan ? 'Edit Product' : 'Add New Product'}</h2>
               <button onClick={() => setShowModal(false)} className="text-zinc-500 hover:text-white"><X className="w-5 h-5" /></button>
             </div>
