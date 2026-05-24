@@ -116,11 +116,8 @@ export default function ActivityTicker() {
   const doubled = [...slice, ...slice]
 
   return (
-    <div className="w-full overflow-hidden bg-zinc-950/80 border-y border-white/5 py-2 select-none" style={{ contain: 'strict', height: '32px' }}>
-      <div
-        className="ticker-track flex items-center whitespace-nowrap"
-        style={{ animation: 'ticker-scroll 60s linear infinite', willChange: 'transform', transform: 'translateZ(0)', backfaceVisibility: 'hidden' }}
-      >
+    <div className="w-full overflow-hidden bg-zinc-950/80 border-y border-white/5 py-2 select-none">
+      <div className="flex items-center whitespace-nowrap ticker-track">
         {doubled.map((e, i) => (
           <span key={i} className="inline-flex items-center gap-1.5 px-4 text-[11px] text-zinc-400 shrink-0">
             <span className="w-1.5 h-1.5 rounded-full bg-green-400 shrink-0" />
