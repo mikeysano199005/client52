@@ -159,7 +159,7 @@ export default function CheckoutPage() {
                   const coBg = coIsBuiltin ? getPlanCardBg(item.plan.name) : '#111113'
                   return (
                     <div key={`${item.plan.id}-${item.variant.label}`} className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-lg border border-white/10 shrink-0 overflow-hidden" style={{ background: coBg }}>
+                      <div className="card-img-area w-9 h-9 rounded-lg border border-white/10 shrink-0 overflow-hidden" style={{ background: coBg }}>
                         {coLogo ? (
                           <img src={coLogo} alt={item.plan.name} className={`w-full h-full ${coIsBuiltin ? 'object-contain p-1' : 'object-cover'}`} />
                         ) : <span className="w-full h-full flex items-center justify-center text-xs font-black text-white">{item.plan.name[0]}</span>}
@@ -366,7 +366,7 @@ export default function CheckoutPage() {
                   const dsBg = dsIsBuiltin ? getPlanCardBg(item.plan.name) : '#111113'
                   return (
                     <div key={`${item.plan.id}-${item.variant.label}`} className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-lg border border-white/10 shrink-0 overflow-hidden" style={{ background: dsBg }}>
+                      <div className="card-img-area w-9 h-9 rounded-lg border border-white/10 shrink-0 overflow-hidden" style={{ background: dsBg }}>
                         {dsLogo ? (
                           <img src={dsLogo} alt={item.plan.name} className={`w-full h-full ${dsIsBuiltin ? 'object-contain p-1' : 'object-cover'}`} />
                         ) : <span className="w-full h-full flex items-center justify-center text-xs font-black text-white">{item.plan.name[0]}</span>}

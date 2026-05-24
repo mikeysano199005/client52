@@ -215,6 +215,10 @@ html.light [class*="border-white/"] { border-color: rgba(0, 0, 0, 0.09); }
 /* ── Card image area stays dark even in light mode ── */
 html.light .card-img { background-color: #1c1c1f !important; }
 
+/* ── card-img-area: dark brand gradient in dark mode, white in light mode ── */
+/* Inline style provides the brand gradient; !important here wins in light mode */
+html.light .card-img-area { background: #ffffff !important; }
+
 /* ── Hero banner text zone — always on dark gradient, keep text light ── */
 html.light .hero-text-zone [class~="text-white"] { color: #ffffff !important; }
 html.light .hero-text-zone [class~="text-zinc-400"] { color: #a1a1aa !important; }

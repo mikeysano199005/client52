@@ -146,7 +146,7 @@ export default function ProductPage() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="rounded-2xl overflow-hidden h-52 sm:h-72 relative"
+              className="card-img-area rounded-2xl overflow-hidden h-52 sm:h-72 relative"
               style={{ background: detailBg }}
             >
               {detailLogo ? (
@@ -472,7 +472,7 @@ export default function ProductPage() {
                 const relBg = relIsBuiltin ? getPlanCardBg(p.name) : '#111113'
                 return (
                   <Link key={p.id} href={`/product/${p.id}`} className="glass glass-hover rounded-xl overflow-hidden group">
-                    <div className="h-28 overflow-hidden relative" style={{ background: relBg }}>
+                    <div className="card-img-area h-28 overflow-hidden relative" style={{ background: relBg }}>
                       {relLogo ? (
                         <img src={relLogo} alt={p.name} className={`absolute inset-0 w-full h-full ${relIsBuiltin ? 'object-contain p-4' : 'object-cover'}`}
                           onError={(e) => { const t = e.target as HTMLImageElement; t.style.display='none'; (t.nextElementSibling as HTMLElement)?.classList.remove('hidden') }} />

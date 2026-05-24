@@ -177,7 +177,7 @@ export default function HeroBanner({ plans, discountedPlans }: HeroBannerProps) 
                 href={`/product/${p.id}`}
                 className="flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors"
               >
-                <div className="w-10 h-10 rounded-lg shrink-0 overflow-hidden flex items-center justify-center border border-white/10" style={{ background: hotBg }}>
+                <div className="card-img-area w-10 h-10 rounded-lg shrink-0 overflow-hidden flex items-center justify-center border border-white/10" style={{ background: hotBg }}>
                   {hotLogo
                     ? <img src={hotLogo} alt={p.name} className={`w-full h-full ${hotLogoIsBuiltin ? 'object-contain p-1.5' : 'object-cover'}`} />
                     : <span className="text-sm font-black text-white">{p.name[0]}</span>

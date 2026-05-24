@@ -46,9 +46,9 @@ export default function ProductCard({ plan, compact = false }: ProductCardProps)
     <Link href={`/product/${plan.id}`} className="block group">
       <div className="glass rounded-xl overflow-hidden transition-all duration-200 group-hover:-translate-y-1 group-hover:border-purple-500/30 group-hover:shadow-lg group-hover:shadow-purple-900/20">
 
-        {/* Image area — inline style ensures dark brand bg in both light/dark mode */}
+        {/* Image area: brand gradient (dark) → white (light mode via CSS !important) */}
         <div
-          className={`relative ${compact ? 'h-28' : 'h-36'} overflow-hidden`}
+          className={`card-img-area relative ${compact ? 'h-28' : 'h-36'} overflow-hidden`}
           style={{ background: cardBg }}
         >
           {logo ? (
