@@ -42,20 +42,18 @@ export default function ProductCard({ plan, compact = false }: ProductCardProps)
     <Link href={`/product/${plan.id}`} className="block group">
         <div className="glass rounded-xl overflow-hidden relative transition-all duration-200 group-hover:-translate-y-1 group-hover:border-purple-500/30 group-hover:shadow-lg group-hover:shadow-purple-900/20">
           {/* Image area */}
-          <div
-            className={`relative bg-[#111113] ${
-              compact ? 'h-28' : 'h-36'
-            } flex items-center justify-center overflow-hidden`}
-          >
-            {/* subtle dot grid */}
-            <div className="absolute inset-0 opacity-40" style={{ backgroundImage: 'radial-gradient(rgba(139,92,246,0.15) 1px, transparent 1px)', backgroundSize: '18px 18px' }} />
+          <div className={`relative bg-[#111113] ${compact ? 'h-28' : 'h-36'} overflow-hidden`}>
 
             {(() => {
               const logo = getPlanLogo(plan.name, plan.image_url)
               return logo ? (
-                <div className="relative z-10 bg-white rounded-2xl flex items-center justify-center shadow-md" style={{ width: 80, height: 80, padding: 10 }}>
-                  <Image src={logo} alt={plan.name} width={60} height={60} className="object-contain" loading="lazy" />
-                </div>
+                <Image
+                  src={logo}
+                  alt={plan.name}
+                  fill
+                  className="object-contain p-4"
+                  loading="lazy"
+                />
               ) : (
                 <div className="relative z-10 w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600/40 to-cyan-600/20 border border-white/10 flex items-center justify-center text-2xl font-black text-white">
                   {plan.name[0]}

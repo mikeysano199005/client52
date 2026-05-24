@@ -141,18 +141,20 @@ export default function ProductPage() {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="rounded-2xl overflow-hidden h-52 sm:h-72 bg-gradient-to-br from-purple-950 via-zinc-900 to-zinc-950 flex items-center justify-center relative"
+              className="rounded-2xl overflow-hidden h-52 sm:h-72 bg-gradient-to-br from-purple-950 via-zinc-900 to-zinc-950 relative"
             >
               {getPlanLogo(plan.name, plan.image_url) ? (
                 <img
                   src={getPlanLogo(plan.name, plan.image_url)!}
                   alt={plan.name}
-                  className="w-1/2 max-h-32 object-contain drop-shadow-2xl"
+                  className="absolute inset-0 w-full h-full object-contain p-8"
                   onError={(e) => { const t = e.target as HTMLImageElement; t.style.display='none'; (t.nextElementSibling as HTMLElement)?.classList.remove('hidden') }}
                 />
               ) : null}
-              <div className={`w-24 h-24 rounded-3xl bg-white/10 border border-white/20 flex items-center justify-center text-5xl font-black text-white ${getPlanLogo(plan.name, plan.image_url) ? 'hidden' : ''}`}>
-                {plan.name[0]}
+              <div className={`absolute inset-0 flex items-center justify-center ${getPlanLogo(plan.name, plan.image_url) ? 'hidden' : ''}`}>
+                <div className="w-24 h-24 rounded-3xl bg-white/10 border border-white/20 flex items-center justify-center text-5xl font-black text-white">
+                  {plan.name[0]}
+                </div>
               </div>
               {plan.badge && (
                 <span className="absolute top-4 left-4 text-xs font-bold text-white bg-purple-600 px-3 py-1 rounded-full">
@@ -459,13 +461,13 @@ export default function ProductPage() {
                 if (!v) return null
                 return (
                   <Link key={p.id} href={`/product/${p.id}`} className="glass glass-hover rounded-xl overflow-hidden group">
-                    <div className="h-28 bg-gradient-to-br from-purple-950/60 to-zinc-950 flex items-center justify-center overflow-hidden">
+                    <div className="h-28 bg-[#111113] overflow-hidden relative">
                       {getPlanLogo(p.name, p.image_url) ? (
-                        <img src={getPlanLogo(p.name, p.image_url)!} alt={p.name} className="w-3/4 max-h-14 object-contain drop-shadow-lg"
+                        <img src={getPlanLogo(p.name, p.image_url)!} alt={p.name} className="absolute inset-0 w-full h-full object-contain p-4"
                           onError={(e) => { const t = e.target as HTMLImageElement; t.style.display='none'; (t.nextElementSibling as HTMLElement)?.classList.remove('hidden') }} />
                       ) : null}
-                      <div className={`w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-lg font-black text-white ${getPlanLogo(p.name, p.image_url) ? 'hidden' : ''}`}>
-                        {p.name[0]}
+                      <div className={`absolute inset-0 flex items-center justify-center ${getPlanLogo(p.name, p.image_url) ? 'hidden' : ''}`}>
+                        <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-lg font-black text-white">{p.name[0]}</div>
                       </div>
                     </div>
                     <div className="p-2.5">
