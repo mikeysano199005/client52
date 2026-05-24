@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Trash2, X, Upload, Database, CheckCircle, AlertTriangle } from 'lucide-react'
+import { Plus, Trash2, X, Database, AlertTriangle, RotateCcw, XCircle } from 'lucide-react'
 import type { Plan } from '@/types'
 import toast from 'react-hot-toast'
 
@@ -13,7 +13,7 @@ interface StockItem {
   password: string
   profile_number?: string
   extra_info?: string
-  status: 'available' | 'used' | 'reserved'
+  status: 'available' | 'used' | 'expired' | 'reserved'
   added_at: string
   plans?: { name: string }
 }
@@ -24,7 +24,7 @@ export default function AdminStockPage() {
   const [loading, setLoading] = useState(true)
   const [showAdd, setShowAdd] = useState(false)
   const [filterPlan, setFilterPlan] = useState('')
-  const [filterStatus, setFilterStatus] = useState('all')
+  const [filterStatus, setFilterStatus] = useState('used')
   const [form, setForm] = useState({ plan_id: '', variant_label: '', email: '', password: '', profile_number: '', extra_info: '' })
   const [bulkText, setBulkText] = useState('')
   const [bulkMode, setBulkMode] = useState(false)
@@ -112,6 +112,20 @@ export default function AdminStockPage() {
     if (res.ok) { toast.success('Deleted'); await loadData() }
   }
 
+  async function updateStockStatus(id: string, status: string) {
+    const res = await fetch(`/api/admin/stock/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    })
+    if (res.ok) {
+      toast.success(`Marked as ${status}`)
+      await loadData()
+    } else {
+      toast.error('Failed to update status')
+    }
+  }
+
   const filtered = stock.filter((s) => {
     const matchPlan = !filterPlan || s.plan_id === filterPlan
     const matchStatus = filterStatus === 'all' || s.status === filterStatus
@@ -168,8 +182,9 @@ export default function AdminStockPage() {
         </select>
         <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="input-dark w-auto min-w-36">
           <option value="all">All Status</option>
+          <option value="used">Used / Delivered</option>
+          <option value="expired">Expired</option>
           <option value="available">Available</option>
-          <option value="used">Used</option>
           <option value="reserved">Reserved</option>
         </select>
       </div>
@@ -202,21 +217,51 @@ export default function AdminStockPage() {
                     <td className="px-4 py-3">
                       <span className={`text-xs px-2 py-1 rounded-full font-medium ${
                         item.status === 'available' ? 'text-green-400 bg-green-400/10' :
-                        item.status === 'used' ? 'text-zinc-500 bg-zinc-800' :
+                        item.status === 'used' ? 'text-blue-400 bg-blue-400/10' :
+                        item.status === 'expired' ? 'text-red-400 bg-red-400/10' :
                         'text-amber-400 bg-amber-400/10'
                       }`}>
-                        {item.status}
+                        {item.status === 'used' ? 'Delivered' : item.status}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-xs text-zinc-600">
                       {new Date(item.added_at).toLocaleDateString('en-IN')}
                     </td>
                     <td className="px-4 py-3">
-                      {item.status === 'available' && (
-                        <button onClick={() => deleteStock(item.id)} className="p-1.5 text-zinc-600 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all">
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      )}
+                      <div className="flex items-center gap-1">
+                        {item.status === 'used' && (
+                          <>
+                            <button
+                              onClick={() => updateStockStatus(item.id, 'expired')}
+                              title="Mark as Expired"
+                              className="p-1.5 text-zinc-600 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all"
+                            >
+                              <XCircle className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => updateStockStatus(item.id, 'available')}
+                              title="Mark as Available (still useable)"
+                              className="p-1.5 text-zinc-600 hover:text-green-400 hover:bg-green-400/10 rounded-lg transition-all"
+                            >
+                              <RotateCcw className="w-3.5 h-3.5" />
+                            </button>
+                          </>
+                        )}
+                        {item.status === 'expired' && (
+                          <button
+                            onClick={() => updateStockStatus(item.id, 'available')}
+                            title="Restore as Available"
+                            className="p-1.5 text-zinc-600 hover:text-green-400 hover:bg-green-400/10 rounded-lg transition-all"
+                          >
+                            <RotateCcw className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                        {item.status === 'available' && (
+                          <button onClick={() => deleteStock(item.id)} className="p-1.5 text-zinc-600 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all">
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))

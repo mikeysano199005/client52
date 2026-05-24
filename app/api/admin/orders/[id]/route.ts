@@ -10,7 +10,7 @@ export async function PATCH(
   try {
     await requireAdmin()
     const { id } = await params
-    const { status, admin_notes } = await req.json()
+    const { status, admin_notes, account_id: explicitAccountId } = await req.json()
 
     // Get the current order
     const { data: order } = await supabaseAdmin
@@ -21,16 +21,24 @@ export async function PATCH(
 
     if (!order) return Response.json({ error: 'Order not found' }, { status: 404 })
 
-    // If delivering, auto-assign account from stock
+    // If delivering, use explicit account_id (admin picked) or auto-assign
     let accountId = order.account_id
     if (status === 'delivered' && !accountId) {
-      const { data: stock } = await supabaseAdmin
-        .from('account_stock')
-        .select('id, email, password, profile_number, extra_info')
-        .eq('plan_id', order.plan_id)
-        .eq('status', 'available')
-        .limit(1)
-        .single()
+      const stockQuery = explicitAccountId
+        ? supabaseAdmin
+            .from('account_stock')
+            .select('id, email, password, profile_number, extra_info')
+            .eq('id', explicitAccountId)
+            .single()
+        : supabaseAdmin
+            .from('account_stock')
+            .select('id, email, password, profile_number, extra_info')
+            .eq('plan_id', order.plan_id)
+            .eq('status', 'available')
+            .limit(1)
+            .single()
+
+      const { data: stock } = await stockQuery
 
       if (stock) {
         accountId = stock.id

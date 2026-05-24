@@ -6,8 +6,10 @@ export async function GET(req: Request) {
     await requireAdmin()
     const url = new URL(req.url)
     const planId = url.searchParams.get('plan_id')
+    const status = url.searchParams.get('status')
     let query = supabaseAdmin.from('account_stock').select('*, plans(name)').order('added_at', { ascending: false })
     if (planId) query = query.eq('plan_id', planId)
+    if (status && status !== 'all') query = query.eq('status', status)
     const { data } = await query
     return Response.json({ stock: data || [] })
   } catch {

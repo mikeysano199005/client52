@@ -1,12 +1,23 @@
 'use client'
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Search, Filter, ChevronDown, X, Send, CheckCircle } from 'lucide-react'
+import { useState, useEffect, useCallback } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import {
+  Search, X, CheckCircle, Package, User, Eye, EyeOff, ChevronRight
+} from 'lucide-react'
 import { formatPrice, formatDateTime, ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '@/lib/utils'
 import type { Order } from '@/types'
 import toast from 'react-hot-toast'
 
 const STATUSES = ['all', 'payment_submitted', 'under_verification', 'processing', 'delivered', 'cancelled']
+
+interface StockAccount {
+  id: string
+  email: string
+  password: string
+  profile_number?: string
+  extra_info?: string
+  variant_label?: string
+}
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([])
@@ -17,21 +28,80 @@ export default function AdminOrdersPage() {
   const [adminNotes, setAdminNotes] = useState('')
   const [updating, setUpdating] = useState(false)
 
+  // Delivery sub-step
+  const [deliverStep, setDeliverStep] = useState(false)
+  const [availableStock, setAvailableStock] = useState<StockAccount[]>([])
+  const [stockLoading, setStockLoading] = useState(false)
+  const [pickedAccount, setPickedAccount] = useState<StockAccount | null>(null)
+  const [showPw, setShowPw] = useState<Record<string, boolean>>({})
+
   useEffect(() => { loadOrders() }, [])
 
   async function loadOrders() {
     setLoading(true)
     const res = await fetch('/api/admin/orders')
-    if (res.ok) {
-      const { orders } = await res.json()
-      setOrders(orders)
-    }
+    if (res.ok) { const { orders } = await res.json(); setOrders(orders) }
     setLoading(false)
   }
 
-  async function updateOrderStatus(orderId: string, status: string) {
+  function openModal(order: Order) {
+    setSelected(order)
+    setAdminNotes(order.admin_notes || '')
+    setDeliverStep(false)
+    setPickedAccount(null)
+    setAvailableStock([])
+  }
+
+  function closeModal() {
+    setSelected(null)
+    setDeliverStep(false)
+    setPickedAccount(null)
+  }
+
+  const loadStock = useCallback(async (planId: string) => {
+    setStockLoading(true)
+    const res = await fetch(`/api/admin/stock?plan_id=${planId}&status=available`)
+    if (res.ok) { const { stock } = await res.json(); setAvailableStock(stock) }
+    setStockLoading(false)
+  }, [])
+
+  function startDeliver() {
+    if (!selected) return
+    setDeliverStep(true)
+    loadStock(selected.plan_id)
+  }
+
+  async function confirmDeliver() {
+    if (!selected) return
+    if (!pickedAccount && availableStock.length > 0) {
+      toast.error('Pick an account to deliver')
+      return
+    }
     setUpdating(true)
-    const res = await fetch(`/api/admin/orders/${orderId}`, {
+    const res = await fetch(`/api/admin/orders/${selected.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        status: 'delivered',
+        admin_notes: adminNotes,
+        account_id: pickedAccount?.id || null,
+      }),
+    })
+    if (res.ok) {
+      toast.success('Order delivered! Credentials sent to customer.')
+      await loadOrders()
+      closeModal()
+    } else {
+      const d = await res.json()
+      toast.error(d.error || 'Failed to deliver')
+    }
+    setUpdating(false)
+  }
+
+  async function updateStatus(status: string) {
+    if (!selected) return
+    setUpdating(true)
+    const res = await fetch(`/api/admin/orders/${selected.id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status, admin_notes: adminNotes }),
@@ -39,10 +109,8 @@ export default function AdminOrdersPage() {
     if (res.ok) {
       toast.success('Order updated!')
       await loadOrders()
-      setSelected(null)
-    } else {
-      toast.error('Failed to update order')
-    }
+      closeModal()
+    } else toast.error('Failed to update')
     setUpdating(false)
   }
 
@@ -60,33 +128,21 @@ export default function AdminOrdersPage() {
       <div className="glass rounded-xl p-4 mb-5 flex flex-wrap gap-3">
         <div className="relative flex-1 min-w-48">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search order #, plan name..."
-            className="input-dark pl-9"
-          />
+          <input value={search} onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search order #, plan name..." className="input-dark pl-9" />
         </div>
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="input-dark w-auto min-w-40"
-        >
-          {STATUSES.map((s) => (
-            <option key={s} value={s}>
-              {s === 'all' ? 'All Statuses' : ORDER_STATUS_LABELS[s] || s}
-            </option>
-          ))}
+        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="input-dark w-auto min-w-40">
+          {STATUSES.map((s) => <option key={s} value={s}>{s === 'all' ? 'All Statuses' : ORDER_STATUS_LABELS[s] || s}</option>)}
         </select>
       </div>
 
-      {/* Stats row */}
+      {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
         {[
           { label: 'Total', value: orders.length, color: 'text-white' },
-          { label: 'Pending', value: orders.filter((o) => ['payment_submitted', 'under_verification', 'processing'].includes(o.status)).length, color: 'text-amber-400' },
-          { label: 'Delivered', value: orders.filter((o) => o.status === 'delivered').length, color: 'text-green-400' },
-          { label: 'Revenue', value: formatPrice(orders.filter((o) => o.status === 'delivered').reduce((s, o) => s + Number(o.amount), 0)), color: 'text-purple-400' },
+          { label: 'Pending', value: orders.filter(o => ['payment_submitted','under_verification','processing'].includes(o.status)).length, color: 'text-amber-400' },
+          { label: 'Delivered', value: orders.filter(o => o.status === 'delivered').length, color: 'text-green-400' },
+          { label: 'Revenue', value: formatPrice(orders.filter(o => o.status === 'delivered').reduce((s, o) => s + Number(o.amount), 0)), color: 'text-purple-400' },
         ].map((s) => (
           <div key={s.label} className="glass rounded-xl p-3 text-center">
             <p className={`text-xl font-bold ${s.color}`}>{s.value}</p>
@@ -101,26 +157,20 @@ export default function AdminOrdersPage() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-white/10">
-                {['Order #', 'Plan', 'Amount', 'Status', 'Date', 'Actions'].map((h) => (
-                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">
-                    {h}
-                  </th>
+                {['Order #', 'Plan', 'Amount', 'Status', 'Date', 'Actions'].map(h => (
+                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
               {loading ? (
                 Array.from({ length: 5 }).map((_, i) => (
-                  <tr key={i}>
-                    {Array.from({ length: 6 }).map((_, j) => (
-                      <td key={j} className="px-4 py-4"><div className="h-4 skeleton rounded" /></td>
-                    ))}
-                  </tr>
+                  <tr key={i}>{Array.from({ length: 6 }).map((_, j) => (
+                    <td key={j} className="px-4 py-4"><div className="h-4 skeleton rounded" /></td>
+                  ))}</tr>
                 ))
               ) : filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-4 py-12 text-center text-zinc-500">No orders found</td>
-                </tr>
+                <tr><td colSpan={6} className="px-4 py-12 text-center text-zinc-500">No orders found</td></tr>
               ) : (
                 filtered.map((order) => (
                   <tr key={order.id} className="hover:bg-white/5 transition-colors">
@@ -137,10 +187,8 @@ export default function AdminOrdersPage() {
                     </td>
                     <td className="px-4 py-3 text-xs text-zinc-500">{formatDateTime(order.created_at)}</td>
                     <td className="px-4 py-3">
-                      <button
-                        onClick={() => { setSelected(order); setAdminNotes(order.admin_notes || '') }}
-                        className="px-3 py-1.5 text-xs bg-purple-600/20 hover:bg-purple-600/40 border border-purple-500/30 text-purple-400 rounded-lg transition-all"
-                      >
+                      <button onClick={() => openModal(order)}
+                        className="px-3 py-1.5 text-xs bg-purple-600/20 hover:bg-purple-600/40 border border-purple-500/30 text-purple-400 rounded-lg transition-all">
                         Manage
                       </button>
                     </td>
@@ -155,89 +203,164 @@ export default function AdminOrdersPage() {
       {/* Order Detail Modal */}
       <AnimatePresence>
         {selected && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
-            onClick={() => setSelected(null)}
+            onClick={closeModal}
           >
-            <motion.div
-              initial={{ scale: 0.95, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.95, y: 20 }}
-              onClick={(e) => e.stopPropagation()}
+            <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
+              onClick={e => e.stopPropagation()}
               className="bg-[#111113] border border-white/10 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
             >
-              <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 sticky top-0 bg-[#111113] z-10">
                 <h2 className="font-bold text-white">Order #{selected.order_number}</h2>
-                <button onClick={() => setSelected(null)} className="text-zinc-500 hover:text-white p-1">
-                  <X className="w-5 h-5" />
-                </button>
+                <button onClick={closeModal} className="text-zinc-500 hover:text-white p-1"><X className="w-5 h-5" /></button>
               </div>
 
               <div className="p-6 space-y-4">
+                {/* Order Info */}
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div><p className="text-zinc-500 text-xs">Plan</p><p className="text-white font-medium">{selected.plan_name}</p></div>
                   <div><p className="text-zinc-500 text-xs">Amount</p><p className="text-white font-bold">{formatPrice(Number(selected.amount))}</p></div>
-                  <div><p className="text-zinc-500 text-xs">Payment UTR</p><p className="text-white font-mono text-xs">{selected.payment_utr || '—'}</p></div>
-                  <div><p className="text-zinc-500 text-xs">Current Status</p>
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${ORDER_STATUS_COLORS[selected.status]}`}>
+                  <div><p className="text-zinc-500 text-xs">Variant</p><p className="text-white text-xs">{(selected.plan_variant as { label?: string })?.label || '—'}</p></div>
+                  <div>
+                    <p className="text-zinc-500 text-xs">Status</p>
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${ORDER_STATUS_COLORS[selected.status]}`}>
                       {ORDER_STATUS_LABELS[selected.status]}
                     </span>
                   </div>
+                  <div><p className="text-zinc-500 text-xs">Payment UTR</p><p className="text-white font-mono text-xs">{selected.payment_utr || '—'}</p></div>
+                  <div><p className="text-zinc-500 text-xs">Date</p><p className="text-white text-xs">{formatDateTime(selected.created_at)}</p></div>
                 </div>
 
                 {selected.payment_proof_url && (
-                  <div>
-                    <p className="text-zinc-500 text-xs mb-2">Payment Proof</p>
-                    <a href={selected.payment_proof_url} target="_blank" rel="noopener noreferrer"
-                      className="text-purple-400 text-sm hover:underline">
-                      View Screenshot →
-                    </a>
-                  </div>
+                  <a href={selected.payment_proof_url} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 text-purple-400 text-sm hover:underline">
+                    <Eye className="w-3.5 h-3.5" /> View Payment Screenshot
+                  </a>
                 )}
 
                 {selected.notes && (
-                  <div>
-                    <p className="text-zinc-500 text-xs mb-1">Customer Notes</p>
+                  <div className="bg-white/5 rounded-xl px-4 py-3">
+                    <p className="text-zinc-500 text-xs mb-1">Customer Note</p>
                     <p className="text-sm text-zinc-300">{selected.notes}</p>
                   </div>
                 )}
 
                 <div>
                   <label className="text-zinc-500 text-xs block mb-1.5">Admin Notes</label>
-                  <textarea
-                    value={adminNotes}
-                    onChange={(e) => setAdminNotes(e.target.value)}
-                    rows={2}
-                    className="input-dark resize-none"
-                    placeholder="Internal notes..."
-                  />
+                  <textarea value={adminNotes} onChange={e => setAdminNotes(e.target.value)}
+                    rows={2} className="input-dark resize-none" placeholder="Internal notes..." />
                 </div>
 
-                {/* Status buttons */}
-                <div>
-                  <p className="text-zinc-500 text-xs mb-2">Update Status</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    {['under_verification', 'processing', 'delivered', 'cancelled'].map((s) => (
-                      <button
-                        key={s}
-                        disabled={updating || selected.status === s}
-                        onClick={() => updateOrderStatus(selected.id, s)}
-                        className={`py-2 px-3 rounded-xl text-xs font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
-                          s === 'delivered'
-                            ? 'bg-green-600 hover:bg-green-500 text-white'
-                            : s === 'cancelled'
-                            ? 'bg-red-600/20 hover:bg-red-600/40 text-red-400 border border-red-500/30'
-                            : 'bg-purple-600/20 hover:bg-purple-600/40 text-purple-400 border border-purple-500/30'
-                        }`}
-                      >
-                        {ORDER_STATUS_LABELS[s]}
-                      </button>
-                    ))}
+                {/* ── Delivery step ── */}
+                {deliverStep ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-green-400 text-sm font-semibold">
+                      <Package className="w-4 h-4" />
+                      Select Account to Deliver
+                    </div>
+
+                    {stockLoading ? (
+                      <div className="space-y-2">
+                        {[1,2,3].map(i => <div key={i} className="h-14 skeleton rounded-xl" />)}
+                      </div>
+                    ) : availableStock.length === 0 ? (
+                      <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-center">
+                        <p className="text-sm text-red-400 font-medium">No stock available for this plan</p>
+                        <p className="text-xs text-zinc-500 mt-1">Add accounts in Account Stock, then try again.</p>
+                        <button onClick={confirmDeliver} disabled={updating}
+                          className="mt-3 px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-xs rounded-lg transition-all disabled:opacity-50">
+                          Deliver Anyway (no credentials)
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <p className="text-xs text-zinc-500">{availableStock.length} account{availableStock.length !== 1 ? 's' : ''} available — pick one to send to customer:</p>
+                        <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+                          {availableStock.map(acc => (
+                            <button key={acc.id} onClick={() => setPickedAccount(acc)}
+                              className={`w-full text-left px-4 py-3 rounded-xl border transition-all ${
+                                pickedAccount?.id === acc.id
+                                  ? 'bg-green-600/15 border-green-500/40'
+                                  : 'bg-white/5 border-white/10 hover:border-purple-500/40'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between gap-2">
+                                <div className="min-w-0">
+                                  <div className="flex items-center gap-2">
+                                    <User className="w-3 h-3 text-zinc-500 shrink-0" />
+                                    <p className="text-sm font-mono text-white truncate">{acc.email}</p>
+                                  </div>
+                                  <div className="flex items-center gap-3 mt-0.5 text-xs text-zinc-500">
+                                    <span className="flex items-center gap-1">
+                                      {showPw[acc.id] ? acc.password : '••••••••'}
+                                      <button onClick={e => { e.stopPropagation(); setShowPw(p => ({ ...p, [acc.id]: !p[acc.id] })) }}
+                                        className="text-zinc-600 hover:text-zinc-400">
+                                        {showPw[acc.id] ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                                      </button>
+                                    </span>
+                                    {acc.profile_number && <span className="text-zinc-600">Profile: {acc.profile_number}</span>}
+                                    {acc.variant_label && <span className="text-zinc-600">{acc.variant_label}</span>}
+                                  </div>
+                                </div>
+                                {pickedAccount?.id === acc.id && <CheckCircle className="w-4 h-4 text-green-400 shrink-0" />}
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+
+                        {pickedAccount && (
+                          <div className="bg-green-500/10 border border-green-500/20 rounded-xl px-4 py-3 text-xs text-green-400">
+                            ✓ Will send: <strong>{pickedAccount.email}</strong> / {pickedAccount.password}
+                            {pickedAccount.profile_number && ` / Profile: ${pickedAccount.profile_number}`}
+                          </div>
+                        )}
+
+                        <div className="flex gap-3 pt-1">
+                          <button onClick={() => { setDeliverStep(false); setPickedAccount(null) }}
+                            className="flex-1 py-2.5 border border-white/20 text-zinc-400 hover:text-white rounded-xl text-sm transition-all">
+                            Back
+                          </button>
+                          <button onClick={confirmDeliver} disabled={updating || !pickedAccount}
+                            className="flex-1 py-2.5 bg-green-600 hover:bg-green-500 disabled:opacity-50 text-white font-semibold rounded-xl text-sm transition-all flex items-center justify-center gap-2">
+                            {updating
+                              ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Delivering...</>
+                              : <><CheckCircle className="w-4 h-4" /> Deliver &amp; Send Credentials</>}
+                          </button>
+                        </div>
+                      </>
+                    )}
                   </div>
-                </div>
+                ) : (
+                  /* ── Normal status buttons ── */
+                  <div>
+                    <p className="text-zinc-500 text-xs mb-2">Update Status</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {(['under_verification', 'processing'] as const).map(s => (
+                        <button key={s} disabled={updating || selected.status === s}
+                          onClick={() => updateStatus(s)}
+                          className="py-2 px-3 rounded-xl text-xs font-semibold bg-purple-600/20 hover:bg-purple-600/40 text-purple-400 border border-purple-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                          {ORDER_STATUS_LABELS[s]}
+                        </button>
+                      ))}
+                      {/* Delivered — triggers account picker */}
+                      <button
+                        disabled={updating || selected.status === 'delivered'}
+                        onClick={startDeliver}
+                        className="py-2 px-3 rounded-xl text-xs font-semibold bg-green-600 hover:bg-green-500 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
+                      >
+                        <Package className="w-3.5 h-3.5" />
+                        Delivered
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                      <button disabled={updating || selected.status === 'cancelled'}
+                        onClick={() => updateStatus('cancelled')}
+                        className="py-2 px-3 rounded-xl text-xs font-semibold bg-red-600/20 hover:bg-red-600/40 text-red-400 border border-red-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                        Cancelled
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </motion.div>
           </motion.div>
