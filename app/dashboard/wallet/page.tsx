@@ -33,8 +33,8 @@ export default function WalletPage() {
   const fileRef = useRef<HTMLInputElement>(null)
 
   const [user, setUser] = useState<UserData | null>(null)
-  const [upiId, setUpiId] = useState('streamzone@upi')
-  const [upiName, setUpiName] = useState('StreamZone')
+  const [upiId, setUpiId] = useState('digitalott@upi')
+  const [upiName, setUpiName] = useState('DIGITAL OTT')
   const [transactions, setTransactions] = useState<WalletTransaction[]>([])
   const [topups, setTopups] = useState<WalletTopup[]>([])
   const [loading, setLoading] = useState(true)

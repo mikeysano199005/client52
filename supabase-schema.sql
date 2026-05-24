@@ -167,14 +167,14 @@ create table if not exists sessions (
 
 -- Default settings
 insert into settings (key, value) values
-  ('site_name', 'StreamZone'),
+  ('site_name', 'DIGITAL OTT'),
   ('site_tagline', 'Premium OTT Subscriptions at Best Prices'),
   ('whatsapp_number', '919999999999'),
   ('telegram_username', 'ottsupport'),
   ('telegram_bot_token', ''),
   ('telegram_admin_chat_id', ''),
   ('upi_id', 'yourupi@paytm'),
-  ('upi_name', 'StreamZone'),
+  ('upi_name', 'DIGITAL OTT'),
   ('referral_reward', '20'),
   ('currency_symbol', '₹')
 on conflict (key) do nothing;
@@ -183,7 +183,7 @@ on conflict (key) do nothing;
 insert into users (name, email, password_hash, role, referral_code)
 values (
   'Admin',
-  'admin@streamzone.in',
+  'admin@digitalott.in',
   '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj/RK.PVvPvu',
   'admin',
   'ADMIN001'

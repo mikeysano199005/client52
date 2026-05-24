@@ -98,7 +98,7 @@ export default function AdminSidebar() {
             <Tv className="w-3.5 h-3.5 text-white" />
           </div>
           <span className="font-bold text-sm text-white">
-            Stream<span className="text-purple-400">Zone</span>
+            <span className="gradient-text">DIGITAL</span> OTT
             <span className="text-[10px] font-normal text-zinc-500 ml-1">Admin</span>
           </span>
         </Link>

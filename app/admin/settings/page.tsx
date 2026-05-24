@@ -46,7 +46,7 @@ export default function AdminSettingsPage() {
       title: 'Site Info',
       icon: <Globe className="w-4 h-4 text-purple-400" />,
       fields: [
-        { key: 'site_name', label: 'Site Name', placeholder: 'StreamZone' },
+        { key: 'site_name', label: 'Site Name', placeholder: 'DIGITAL OTT' },
         { key: 'site_tagline', label: 'Tagline', placeholder: 'Premium OTT Subscriptions' },
       ],
     },
@@ -65,7 +65,7 @@ export default function AdminSettingsPage() {
       icon: <CreditCard className="w-4 h-4 text-amber-400" />,
       fields: [
         { key: 'upi_id', label: 'UPI ID', placeholder: 'yourupi@paytm' },
-        { key: 'upi_name', label: 'UPI Name (shown to customer)', placeholder: 'StreamZone' },
+        { key: 'upi_name', label: 'UPI Name (shown to customer)', placeholder: 'DIGITAL OTT' },
       ],
     },
     {
