@@ -78,6 +78,10 @@ export default function CheckoutPage() {
 
   async function handlePlaceOrder() {
     if (!user) return
+    if (finalAmount > 0 && !paymentUTR.trim()) {
+      toast.error('UTR / Transaction ID is required')
+      return
+    }
     if (finalAmount > 0 && !paymentProof) {
       toast.error('Please upload payment screenshot')
       return
@@ -170,40 +174,68 @@ export default function CheckoutPage() {
             {/* UPI Payment Info */}
             <div className="glass rounded-xl p-5">
               <h2 className="font-bold text-white mb-4">Payment Instructions</h2>
-              <div className="bg-purple-600/10 border border-purple-500/20 rounded-xl p-4 mb-4">
-                <p className="text-sm text-zinc-300 mb-3">Pay using UPI to complete your order:</p>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-zinc-500">UPI ID</p>
-                    <p className="font-bold text-white text-lg font-mono">{upiId}</p>
-                    <p className="text-xs text-zinc-500 mt-1">Name: {upiName}</p>
-                  </div>
-                  <button
-                    onClick={() => { navigator.clipboard.writeText(upiId); toast.success('UPI ID copied!') }}
-                    className="p-2.5 bg-purple-600/20 hover:bg-purple-600/40 border border-purple-500/30 rounded-lg text-purple-400 transition-all"
-                  >
-                    <Copy className="w-4 h-4" />
-                  </button>
+
+              {/* QR Code + UPI row */}
+              <div className="flex flex-col sm:flex-row gap-4 mb-4">
+                {/* QR Code */}
+                <div className="flex flex-col items-center justify-center bg-white rounded-2xl p-3 sm:w-44 shrink-0">
+                  <img
+                    src="/payment-qr.png"
+                    alt="Scan to Pay QR"
+                    className="w-36 h-36 object-contain"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                  />
+                  <p className="text-[10px] text-zinc-500 mt-1.5 font-medium">Scan to Pay</p>
                 </div>
-                <div className="mt-3 pt-3 border-t border-white/10">
-                  <p className="text-xs text-zinc-500">Amount to Pay</p>
-                  <p className="text-2xl font-bold text-white">{formatPrice(finalAmount)}</p>
+
+                {/* UPI details */}
+                <div className="flex-1 bg-purple-600/10 border border-purple-500/20 rounded-xl p-4 flex flex-col justify-between">
+                  <div>
+                    <p className="text-xs text-zinc-400 mb-3">Pay using any UPI app:</p>
+                    <div className="flex items-center justify-between gap-2 mb-3">
+                      <div className="min-w-0">
+                        <p className="text-[10px] text-zinc-500 uppercase tracking-wider">UPI ID</p>
+                        <p className="font-bold text-white text-base font-mono break-all">{upiId}</p>
+                        <p className="text-xs text-zinc-400 mt-0.5">Name: <span className="text-white font-semibold">{upiName}</span></p>
+                      </div>
+                      <button
+                        onClick={() => { navigator.clipboard.writeText(upiId); toast.success('UPI ID copied!') }}
+                        className="p-2.5 bg-purple-600/20 hover:bg-purple-600/40 border border-purple-500/30 rounded-lg text-purple-400 transition-all shrink-0"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5 text-[10px] text-zinc-500">
+                      {['GPay', 'PhonePe', 'Paytm', 'BHIM', 'Fampay'].map((app) => (
+                        <span key={app} className="px-2 py-0.5 bg-white/5 border border-white/10 rounded text-zinc-400">{app}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-white/10">
+                    <p className="text-[10px] text-zinc-500 uppercase tracking-wider">Amount to Pay</p>
+                    <p className="text-2xl font-bold text-white">{formatPrice(finalAmount)}</p>
+                  </div>
                 </div>
               </div>
 
               <div className="space-y-3">
                 <div>
-                  <label className="text-xs font-medium text-zinc-400 block mb-1.5">UTR / Transaction ID</label>
+                  <label className="text-xs font-medium text-zinc-400 block mb-1.5">
+                    UTR / Transaction ID <span className="text-red-400">*</span>
+                    <span className="text-zinc-600 font-normal ml-1">(mandatory)</span>
+                  </label>
                   <input
                     value={paymentUTR}
                     onChange={(e) => setPaymentUTR(e.target.value)}
-                    placeholder="12-digit UTR number"
-                    className="input-dark"
+                    placeholder="Enter 12-digit UTR / transaction number"
+                    className={`input-dark ${!paymentUTR.trim() && finalAmount > 0 ? 'border-red-500/40' : ''}`}
+                    required
                   />
+                  <p className="text-[10px] text-zinc-600 mt-1">Find this in your payment app under transaction details</p>
                 </div>
 
                 <div>
-                  <label className="text-xs font-medium text-zinc-400 block mb-1.5">Upload Payment Screenshot *</label>
+                  <label className="text-xs font-medium text-zinc-400 block mb-1.5">Upload Payment Screenshot <span className="text-red-400">*</span></label>
                   <div
                     onClick={() => fileRef.current?.click()}
                     className="border-2 border-dashed border-white/20 hover:border-purple-500/50 rounded-xl p-6 text-center cursor-pointer transition-all"
