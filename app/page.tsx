@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { supabaseAdmin } from '@/lib/supabase'
 import { getSession } from '@/lib/auth'
 import Navbar from '@/components/layout/Navbar'
@@ -76,10 +77,13 @@ export default async function HomePage() {
                     <div className="absolute inset-0 opacity-40" style={{ backgroundImage: 'radial-gradient(rgba(139,92,246,0.15) 1px, transparent 1px)', backgroundSize: '18px 18px' }} />
                     {getPlanLogo(plan.name, plan.image_url) ? (
                       <div className="relative z-10 bg-white rounded-xl flex items-center justify-center shadow-md" style={{ width: 64, height: 64, padding: 8 }}>
-                        <img
+                        <Image
                           src={getPlanLogo(plan.name, plan.image_url)!}
                           alt={plan.name}
-                          className="w-full h-full object-contain"
+                          width={48}
+                          height={48}
+                          className="object-contain"
+                          loading="lazy"
                         />
                       </div>
                     ) : (

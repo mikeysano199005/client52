@@ -180,12 +180,12 @@ export default function OrdersPage() {
 
                   {/* Progress bar */}
                   {order.status !== 'cancelled' && (
-                    <div className="px-5 py-5 border-b border-white/10">
+                    <div className="px-4 py-4 border-b border-white/10">
                       <div className="flex items-start">
                         {STEPS.map((step, i) => (
-                          <div key={step.key} className="flex items-center flex-1">
-                            <div className="flex flex-col items-center">
-                              <div className={`w-7 h-7 rounded-full border-2 flex items-center justify-center text-xs font-bold transition-all ${
+                          <div key={step.key} className="flex items-center flex-1 min-w-0">
+                            <div className="flex flex-col items-center min-w-0 w-full">
+                              <div className={`w-6 h-6 sm:w-7 sm:h-7 rounded-full border-2 flex items-center justify-center text-[10px] font-bold transition-all shrink-0 ${
                                 i < currentIdx
                                   ? 'bg-purple-600 border-purple-600 text-white'
                                   : i === currentIdx
@@ -194,14 +194,14 @@ export default function OrdersPage() {
                               }`}>
                                 {i < currentIdx ? '✓' : i + 1}
                               </div>
-                              <p className={`text-[10px] mt-1.5 text-center w-20 leading-tight whitespace-pre-line ${
+                              <p className={`text-[9px] sm:text-[10px] mt-1 text-center leading-tight whitespace-pre-line px-0.5 ${
                                 i <= currentIdx ? 'text-purple-400' : 'text-zinc-600'
                               }`}>
                                 {step.label}
                               </p>
                             </div>
                             {i < STEPS.length - 1 && (
-                              <div className={`flex-1 h-0.5 mx-1 mb-5 transition-all duration-500 ${
+                              <div className={`flex-1 h-px mx-1 mb-4 transition-all duration-500 shrink ${
                                 i < currentIdx ? 'bg-purple-600' : 'bg-zinc-800'
                               }`} />
                             )}

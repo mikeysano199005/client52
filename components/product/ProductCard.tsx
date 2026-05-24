@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
-import { Star, ShoppingCart, Zap } from 'lucide-react'
-import { motion } from 'framer-motion'
+import Image from 'next/image'
+import { Star, ShoppingCart } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
 import type { Plan } from '@/types'
 import { formatPrice, getDiscount } from '@/lib/utils'
@@ -39,16 +39,8 @@ export default function ProductCard({ plan, compact = false }: ProductCardProps)
   }
 
   return (
-    <motion.div
-      whileHover={{ y: -4 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-    >
-      <Link href={`/product/${plan.id}`} className="block group">
-        <div
-          className={`glass rounded-xl overflow-hidden relative ${
-            compact ? 'p-0' : 'p-0'
-          }`}
-        >
+    <Link href={`/product/${plan.id}`} className="block group">
+        <div className="glass rounded-xl overflow-hidden relative transition-all duration-200 group-hover:-translate-y-1 group-hover:border-purple-500/30 group-hover:shadow-lg group-hover:shadow-purple-900/20">
           {/* Image area */}
           <div
             className={`relative bg-[#111113] ${
@@ -62,11 +54,7 @@ export default function ProductCard({ plan, compact = false }: ProductCardProps)
               const logo = getPlanLogo(plan.name, plan.image_url)
               return logo ? (
                 <div className="relative z-10 bg-white rounded-2xl flex items-center justify-center shadow-md" style={{ width: 80, height: 80, padding: 10 }}>
-                  <img
-                    src={logo}
-                    alt={plan.name}
-                    className="w-full h-full object-contain"
-                  />
+                  <Image src={logo} alt={plan.name} width={60} height={60} className="object-contain" loading="lazy" />
                 </div>
               ) : (
                 <div className="relative z-10 w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600/40 to-cyan-600/20 border border-white/10 flex items-center justify-center text-2xl font-black text-white">
@@ -154,8 +142,7 @@ export default function ProductCard({ plan, compact = false }: ProductCardProps)
             )}
           </div>
         </div>
-      </Link>
-    </motion.div>
+    </Link>
   )
 }
 

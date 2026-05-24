@@ -213,9 +213,9 @@ export default function Navbar({ user }: NavbarProps) {
             onClick={() => setSearchOpen(false)}
           >
             <motion.div
-              initial={{ y: -20, scale: 0.95 }}
-              animate={{ y: 0, scale: 1 }}
-              exit={{ y: -20, scale: 0.95 }}
+              initial={{ opacity: 0, y: -12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
               onClick={(e) => e.stopPropagation()}
               className="w-full max-w-lg"
             >
