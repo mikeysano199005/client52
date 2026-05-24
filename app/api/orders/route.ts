@@ -121,7 +121,7 @@ export async function GET() {
     const user = await requireAuth()
     const { data: orders } = await supabaseAdmin
       .from('orders')
-      .select('*')
+      .select('*, account_stock(email, password, profile_number, extra_info)')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
 
