@@ -28,7 +28,7 @@ export default function AdminAnalyticsPage() {
   }, [])
 
   if (loading) return (
-    <div className="p-6 max-w-6xl mx-auto space-y-4">
+    <div className="p-4 sm:p-6 max-w-6xl mx-auto space-y-4">
       {[...Array(4)].map((_, i) => <div key={i} className="h-28 bg-zinc-800 rounded-xl animate-pulse" />)}
     </div>
   )
@@ -36,7 +36,7 @@ export default function AdminAnalyticsPage() {
   if (!data) return null
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="p-4 sm:p-6 max-w-6xl mx-auto">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-white">Revenue Analytics</h1>
         <p className="text-zinc-500 text-sm mt-1">Business performance overview</p>

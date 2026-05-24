@@ -32,7 +32,7 @@ export default function AdminSettingsPage() {
 
   if (loading) {
     return (
-      <div className="p-6 lg:p-8">
+      <div className="p-4 sm:p-6 lg:p-8">
         <div className="h-8 skeleton rounded w-48 mb-6" />
         <div className="space-y-4">
           {Array.from({ length: 6 }).map((_, i) => <div key={i} className="h-16 skeleton rounded-xl" />)}
@@ -78,7 +78,7 @@ export default function AdminSettingsPage() {
   ]
 
   return (
-    <div className="p-6 lg:p-8">
+    <div className="p-4 sm:p-6 lg:p-8">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-white flex items-center gap-2">
           <Settings className="w-6 h-6 text-purple-400" />

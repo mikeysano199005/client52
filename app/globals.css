@@ -30,6 +30,7 @@ body {
   font-family: var(--font-geist-sans), system-ui, sans-serif;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 /* Scrollbar */

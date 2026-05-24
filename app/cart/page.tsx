@@ -32,7 +32,7 @@ export default function CartPage() {
         </h1>
 
         {count() === 0 ? (
-          <div className="glass rounded-2xl p-16 text-center">
+          <div className="glass rounded-2xl p-8 sm:p-16 text-center">
             <ShoppingCart className="w-16 h-16 text-zinc-700 mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-white mb-2">Your cart is empty</h2>
             <p className="text-zinc-500 mb-6">Add some amazing OTT plans to get started</p>
@@ -55,22 +55,22 @@ export default function CartPage() {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 20, height: 0 }}
-                    className="glass rounded-xl p-4 flex items-center gap-4"
+                    className="glass rounded-xl p-3 sm:p-4 flex items-center gap-3"
                   >
-                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-900/60 to-zinc-900 border border-white/10 flex items-center justify-center text-xl font-black text-white shrink-0">
+                    <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br from-purple-900/60 to-zinc-900 border border-white/10 flex items-center justify-center text-lg font-black text-white shrink-0">
                       {item.plan.name[0]}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-white truncate">{item.plan.name}</p>
-                      <p className="text-sm text-zinc-500">{item.variant.label} • {item.variant.quality} • {item.variant.access}</p>
+                      <p className="font-semibold text-white text-sm truncate">{item.plan.name}</p>
+                      <p className="text-xs text-zinc-500">{item.variant.label} • {item.variant.quality}</p>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="font-bold text-white">{formatPrice(item.variant.price)}</p>
+                      <p className="font-bold text-white text-sm">{formatPrice(item.variant.price)}</p>
                       <p className="text-xs text-zinc-500 line-through">{formatPrice(item.variant.original_price)}</p>
                     </div>
                     <button
                       onClick={() => removeItem(item.plan.id, item.variant.label)}
-                      className="p-2 text-zinc-600 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all shrink-0"
+                      className="p-1.5 text-zinc-600 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all shrink-0"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

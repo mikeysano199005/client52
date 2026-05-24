@@ -143,6 +143,28 @@ export default function CheckoutPage() {
         <h1 className="text-2xl font-bold text-white mb-6">Checkout</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Mobile: order summary first */}
+          <div className="lg:hidden space-y-4">
+            <div className="glass rounded-xl p-4">
+              <h2 className="font-bold text-white mb-3 text-sm">Order Summary</h2>
+              <div className="space-y-2 mb-3">
+                {items.map((item) => (
+                  <div key={`${item.plan.id}-${item.variant.label}`} className="flex justify-between text-sm">
+                    <div className="min-w-0 mr-2">
+                      <p className="text-white truncate text-xs">{item.plan.name}</p>
+                      <p className="text-zinc-500 text-xs">{item.variant.label}</p>
+                    </div>
+                    <span className="text-white shrink-0 text-sm font-semibold">{formatPrice(item.variant.price)}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="flex justify-between font-bold text-white border-t border-white/10 pt-2">
+                <span>Total</span>
+                <span className="text-purple-400">{formatPrice(finalAmount)}</span>
+              </div>
+            </div>
+          </div>
+
           {/* Left: Payment details */}
           <div className="lg:col-span-2 space-y-5">
             {/* UPI Payment Info */}
@@ -279,8 +301,19 @@ export default function CheckoutPage() {
             )}
           </div>
 
-          {/* Right: Order summary */}
-          <div className="space-y-4">
+          {/* Mobile place order button */}
+          <div className="lg:hidden">
+            <button
+              onClick={handlePlaceOrder}
+              disabled={loading}
+              className="w-full py-3.5 bg-purple-600 hover:bg-purple-500 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-all glow-purple-sm flex items-center justify-center gap-2"
+            >
+              {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : 'Place Order'}
+            </button>
+          </div>
+
+          {/* Right: Order summary (desktop only) */}
+          <div className="hidden lg:block space-y-4">
             <div className="glass rounded-xl p-5">
               <h2 className="font-bold text-white mb-4">Order Summary</h2>
               <div className="space-y-3 mb-4">

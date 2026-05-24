@@ -27,7 +27,7 @@ export default function AdminReferralsPage() {
   const totalPaid = referrals.filter(r => r.status === 'credited').reduce((s, r) => s + r.reward_amount, 0)
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="p-4 sm:p-6 max-w-6xl mx-auto">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-white">Referrals</h1>
         <p className="text-zinc-500 text-sm mt-1">{referrals.length} total · {formatPrice(totalPaid)} paid out</p>

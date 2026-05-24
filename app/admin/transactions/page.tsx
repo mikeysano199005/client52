@@ -28,7 +28,7 @@ export default function AdminTransactionsPage() {
   const totalDebits = txns.filter(t => t.type === 'debit').reduce((s, t) => s + t.amount, 0)
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="p-4 sm:p-6 max-w-6xl mx-auto">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-white">Wallet Transactions</h1>
         <p className="text-zinc-500 text-sm mt-1">{txns.length} total transactions</p>

@@ -1,9 +1,16 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Geist } from 'next/font/google'
 import './globals.css'
 import { Toaster } from 'react-hot-toast'
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist-sans' })
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: '#09090b',
+}
 
 export const metadata: Metadata = {
   title: 'StreamZone - Premium OTT Subscriptions',

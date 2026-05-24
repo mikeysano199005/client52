@@ -122,7 +122,7 @@ export default function ProductPage() {
     <div className="min-h-screen">
       <Navbar user={user} />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-20">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-16 sm:pb-20">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-xs text-zinc-500 mb-6">
           <Link href="/" className="hover:text-purple-400">Home</Link>
@@ -140,7 +140,7 @@ export default function ProductPage() {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="rounded-2xl overflow-hidden h-72 bg-gradient-to-br from-purple-950 via-zinc-900 to-zinc-950 flex items-center justify-center relative"
+              className="rounded-2xl overflow-hidden h-52 sm:h-72 bg-gradient-to-br from-purple-950 via-zinc-900 to-zinc-950 flex items-center justify-center relative"
             >
               <div className="w-24 h-24 rounded-3xl bg-white/10 border border-white/20 flex items-center justify-center text-5xl font-black text-white backdrop-blur-sm">
                 {plan.name[0]}

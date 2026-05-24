@@ -27,21 +27,33 @@ export default async function WalletPage() {
       <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-20">
         <h1 className="text-2xl font-bold text-white mb-6">My Wallet</h1>
 
-        <div className="grid grid-cols-3 gap-4 mb-8">
-          <div className="glass rounded-xl p-5 text-center">
-            <Wallet className="w-6 h-6 text-purple-400 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-white">{formatPrice(user.wallet_balance)}</p>
-            <p className="text-xs text-zinc-500 mt-1">Available Balance</p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-8">
+          <div className="glass rounded-xl p-4 sm:p-5 flex sm:flex-col items-center sm:items-center gap-3 sm:gap-0">
+            <div className="w-9 h-9 bg-purple-400/10 rounded-xl flex items-center justify-center shrink-0">
+              <Wallet className="w-5 h-5 text-purple-400" />
+            </div>
+            <div className="sm:text-center sm:mt-2">
+              <p className="text-xl sm:text-2xl font-bold text-white">{formatPrice(user.wallet_balance)}</p>
+              <p className="text-xs text-zinc-500 mt-0.5">Available Balance</p>
+            </div>
           </div>
-          <div className="glass rounded-xl p-5 text-center">
-            <TrendingUp className="w-6 h-6 text-green-400 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-white">{formatPrice(totalCredits)}</p>
-            <p className="text-xs text-zinc-500 mt-1">Total Credited</p>
+          <div className="glass rounded-xl p-4 sm:p-5 flex sm:flex-col items-center sm:items-center gap-3 sm:gap-0">
+            <div className="w-9 h-9 bg-green-400/10 rounded-xl flex items-center justify-center shrink-0">
+              <TrendingUp className="w-5 h-5 text-green-400" />
+            </div>
+            <div className="sm:text-center sm:mt-2">
+              <p className="text-xl sm:text-2xl font-bold text-white">{formatPrice(totalCredits)}</p>
+              <p className="text-xs text-zinc-500 mt-0.5">Total Credited</p>
+            </div>
           </div>
-          <div className="glass rounded-xl p-5 text-center">
-            <ArrowDownLeft className="w-6 h-6 text-red-400 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-white">{formatPrice(totalDebits)}</p>
-            <p className="text-xs text-zinc-500 mt-1">Total Used</p>
+          <div className="glass rounded-xl p-4 sm:p-5 flex sm:flex-col items-center sm:items-center gap-3 sm:gap-0">
+            <div className="w-9 h-9 bg-red-400/10 rounded-xl flex items-center justify-center shrink-0">
+              <ArrowDownLeft className="w-5 h-5 text-red-400" />
+            </div>
+            <div className="sm:text-center sm:mt-2">
+              <p className="text-xl sm:text-2xl font-bold text-white">{formatPrice(totalDebits)}</p>
+              <p className="text-xs text-zinc-500 mt-0.5">Total Used</p>
+            </div>
           </div>
         </div>
 

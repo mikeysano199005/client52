@@ -43,7 +43,7 @@ export default async function OrdersPage() {
         </div>
 
         {orders.length === 0 ? (
-          <div className="glass rounded-2xl p-16 text-center">
+          <div className="glass rounded-2xl p-8 sm:p-16 text-center">
             <Package className="w-16 h-16 text-zinc-700 mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-white mb-2">No orders yet</h2>
             <p className="text-zinc-500 mb-6">Start browsing our amazing OTT plans</p>

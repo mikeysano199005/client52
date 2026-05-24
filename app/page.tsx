@@ -44,7 +44,7 @@ export default async function HomePage() {
     <div className="min-h-screen">
       <Navbar user={user ? { name: user.name, role: user.role, wallet_balance: user.wallet_balance } : null} />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 pb-20">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 pb-16 sm:pb-20">
         <HeroBanner plans={featured} banners={[]} discountedPlans={discounted} />
         <CategoryRow />
         <TopSellers plans={plans} />

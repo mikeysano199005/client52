@@ -35,7 +35,7 @@ export default async function DashboardPage() {
     <div className="min-h-screen">
       <Navbar user={{ name: user.name, role: user.role, wallet_balance: user.wallet_balance }} />
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-20">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-16 sm:pb-20">
         {/* Welcome */}
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-white">

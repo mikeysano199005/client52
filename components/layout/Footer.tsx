@@ -103,11 +103,11 @@ export default function Footer() {
 
       {/* Bottom bar */}
       <div className="border-t border-white/5 py-4">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
           <p className="text-xs text-zinc-600">
             © {new Date().getFullYear()} StreamZone. All rights reserved.
           </p>
-          <div className="flex items-center gap-4">
+          <div className="hidden sm:flex items-center gap-4">
             {['OTT', 'Games', 'Combos', 'Utilities', 'VPN'].map((c) => (
               <Link key={c} href={`/category/${c.toLowerCase()}`} className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors">
                 {c}

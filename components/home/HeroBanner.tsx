@@ -70,9 +70,9 @@ export default function HeroBanner({ plans, discountedPlans }: HeroBannerProps) 
   const cheapest = plan.price_variants[0]
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4 pt-20">
+    <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4 pt-16 sm:pt-20">
       {/* Main slider */}
-      <div className="relative rounded-2xl overflow-hidden h-[340px] sm:h-[400px]">
+      <div className="relative rounded-2xl overflow-hidden h-[240px] sm:h-[320px] lg:h-[400px]">
         <AnimatePresence mode="wait">
           <motion.div
             key={plan.id}
@@ -98,7 +98,7 @@ export default function HeroBanner({ plans, discountedPlans }: HeroBannerProps) 
         />
 
         {/* Content */}
-        <div className="relative z-10 h-full flex flex-col justify-end p-6 sm:p-8">
+        <div className="relative z-10 h-full flex flex-col justify-end p-4 sm:p-6 lg:p-8">
           <AnimatePresence mode="wait">
             <motion.div
               key={plan.id + '-content'}
@@ -117,7 +117,7 @@ export default function HeroBanner({ plans, discountedPlans }: HeroBannerProps) 
                   </div>
                 )}
                 <div>
-                  <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">{getPlanLogo(plan) ? '' : plan.name}</h2>
+                  <h2 className="text-lg sm:text-2xl lg:text-3xl font-black text-white tracking-tight">{getPlanLogo(plan) ? '' : plan.name}</h2>
                   <div className="flex items-center gap-2 text-xs text-zinc-400">
                     <span>{cheapest?.quality}</span>
                     <span>•</span>
@@ -130,7 +130,7 @@ export default function HeroBanner({ plans, discountedPlans }: HeroBannerProps) 
               </div>
 
               {plan.description && (
-                <p className="text-sm text-zinc-400 mb-4 max-w-lg line-clamp-2">{plan.description}</p>
+                <p className="hidden sm:block text-sm text-zinc-400 mb-4 max-w-lg line-clamp-2">{plan.description}</p>
               )}
 
               <div className="flex items-center gap-4 flex-wrap">

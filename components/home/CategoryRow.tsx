@@ -7,7 +7,7 @@ const CATEGORIES = [
   {
     label: 'All',
     slug: 'all',
-    icon: <LayoutGrid className="w-6 h-6" />,
+    icon: <LayoutGrid className="w-5 h-5 sm:w-6 sm:h-6" />,
     gradient: 'from-slate-500 via-slate-600 to-slate-700',
     glow: 'hover:shadow-slate-500/40',
     ring: 'hover:ring-slate-500/50',
@@ -15,7 +15,7 @@ const CATEGORIES = [
   {
     label: 'OTT',
     slug: 'ott',
-    icon: <Tv className="w-6 h-6" />,
+    icon: <Tv className="w-5 h-5 sm:w-6 sm:h-6" />,
     gradient: 'from-violet-600 via-purple-600 to-purple-700',
     glow: 'hover:shadow-purple-500/40',
     ring: 'hover:ring-purple-500/50',
@@ -23,7 +23,7 @@ const CATEGORIES = [
   {
     label: 'Combos',
     slug: 'combos',
-    icon: <Package2 className="w-6 h-6" />,
+    icon: <Package2 className="w-5 h-5 sm:w-6 sm:h-6" />,
     gradient: 'from-cyan-500 via-teal-500 to-teal-600',
     glow: 'hover:shadow-cyan-500/40',
     ring: 'hover:ring-cyan-500/50',
@@ -31,7 +31,7 @@ const CATEGORIES = [
   {
     label: 'Games',
     slug: 'games',
-    icon: <Gamepad2 className="w-6 h-6" />,
+    icon: <Gamepad2 className="w-5 h-5 sm:w-6 sm:h-6" />,
     gradient: 'from-emerald-500 via-green-500 to-green-600',
     glow: 'hover:shadow-green-500/40',
     ring: 'hover:ring-green-500/50',
@@ -39,7 +39,7 @@ const CATEGORIES = [
   {
     label: 'VPN',
     slug: 'vpn',
-    icon: <Wifi className="w-6 h-6" />,
+    icon: <Wifi className="w-5 h-5 sm:w-6 sm:h-6" />,
     gradient: 'from-blue-500 via-blue-600 to-indigo-600',
     glow: 'hover:shadow-blue-500/40',
     ring: 'hover:ring-blue-500/50',
@@ -47,7 +47,7 @@ const CATEGORIES = [
   {
     label: 'Utilities',
     slug: 'utilities',
-    icon: <Zap className="w-6 h-6" />,
+    icon: <Zap className="w-5 h-5 sm:w-6 sm:h-6" />,
     gradient: 'from-orange-500 via-orange-600 to-amber-600',
     glow: 'hover:shadow-orange-500/40',
     ring: 'hover:ring-orange-500/50',
@@ -55,7 +55,7 @@ const CATEGORIES = [
   {
     label: 'Premium',
     slug: 'premium',
-    icon: <Star className="w-6 h-6" />,
+    icon: <Star className="w-5 h-5 sm:w-6 sm:h-6" />,
     gradient: 'from-amber-400 via-yellow-500 to-orange-500',
     glow: 'hover:shadow-amber-400/40',
     ring: 'hover:ring-amber-400/50',
@@ -63,7 +63,7 @@ const CATEGORIES = [
   {
     label: 'Digital Keys',
     slug: 'digital-keys',
-    icon: <Key className="w-6 h-6" />,
+    icon: <Key className="w-5 h-5 sm:w-6 sm:h-6" />,
     gradient: 'from-pink-500 via-rose-500 to-pink-600',
     glow: 'hover:shadow-pink-500/40',
     ring: 'hover:ring-pink-500/50',
@@ -87,7 +87,7 @@ export default function CategoryRow() {
               className="flex flex-col items-center gap-2.5 group"
             >
               <div className={`
-                relative w-16 h-16 rounded-2xl
+                relative w-12 h-12 sm:w-16 sm:h-16 rounded-2xl
                 bg-gradient-to-br ${cat.gradient}
                 flex items-center justify-center text-white
                 shadow-lg ${cat.glow}

@@ -55,7 +55,7 @@ export default function AdminSupportPage() {
   }
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="p-4 sm:p-6 max-w-6xl mx-auto">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-white">Support Tickets</h1>
         <p className="text-zinc-500 text-sm mt-1">{tickets.filter(t => t.status === 'open').length} open tickets</p>
