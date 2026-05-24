@@ -195,7 +195,7 @@ export default function AdminStockPage() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-white/10">
-                {['Plan', 'Email', 'Password', 'Profile', 'Status', 'Added', ''].map((h) => (
+                {['Plan', 'Variant', 'Email', 'Password', 'Profile', 'Status', 'Added', ''].map((h) => (
                   <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
@@ -203,14 +203,19 @@ export default function AdminStockPage() {
             <tbody className="divide-y divide-white/5">
               {loading ? (
                 Array.from({ length: 5 }).map((_, i) => (
-                  <tr key={i}>{Array.from({ length: 7 }).map((_, j) => <td key={j} className="px-4 py-4"><div className="h-4 skeleton rounded" /></td>)}</tr>
+                  <tr key={i}>{Array.from({ length: 8 }).map((_, j) => <td key={j} className="px-4 py-4"><div className="h-4 skeleton rounded" /></td>)}</tr>
                 ))
               ) : filtered.length === 0 ? (
-                <tr><td colSpan={7} className="px-4 py-12 text-center text-zinc-500">No stock found</td></tr>
+                <tr><td colSpan={8} className="px-4 py-12 text-center text-zinc-500">No stock found</td></tr>
               ) : (
                 filtered.map((item) => (
                   <tr key={item.id} className="hover:bg-white/5 transition-colors">
                     <td className="px-4 py-3 text-sm text-white">{item.plans?.name || '—'}</td>
+                    <td className="px-4 py-3">
+                      {item.variant_label
+                        ? <span className="text-xs px-2 py-1 rounded-full bg-purple-600/20 text-purple-400 font-medium">{item.variant_label}</span>
+                        : <span className="text-xs text-zinc-600">—</span>}
+                    </td>
                     <td className="px-4 py-3 text-sm font-mono text-zinc-300">{item.email}</td>
                     <td className="px-4 py-3 text-sm font-mono text-zinc-400">{item.password}</td>
                     <td className="px-4 py-3 text-sm text-zinc-500">{item.profile_number || '—'}</td>
@@ -296,16 +301,36 @@ export default function AdminStockPage() {
               <div className="p-6 space-y-4">
                 <div>
                   <label className="text-xs font-medium text-zinc-400 block mb-1.5">Plan *</label>
-                  <select value={form.plan_id} onChange={(e) => setForm({ ...form, plan_id: e.target.value })} className="input-dark">
+                  <select
+                    value={form.plan_id}
+                    onChange={(e) => setForm({ ...form, plan_id: e.target.value, variant_label: '' })}
+                    className="input-dark"
+                  >
                     <option value="">Select Plan</option>
                     {plans.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
                   </select>
                 </div>
 
-                <div>
-                  <label className="text-xs font-medium text-zinc-400 block mb-1.5">Variant Label (optional)</label>
-                  <input value={form.variant_label} onChange={(e) => setForm({ ...form, variant_label: e.target.value })} placeholder="e.g. 1 Month" className="input-dark" />
-                </div>
+                {form.plan_id && (() => {
+                  const selectedPlan = plans.find(p => p.id === form.plan_id)
+                  const variants = selectedPlan?.price_variants || []
+                  return variants.length > 0 ? (
+                    <div>
+                      <label className="text-xs font-medium text-zinc-400 block mb-1.5">Variant / Duration *</label>
+                      <select
+                        value={form.variant_label}
+                        onChange={(e) => setForm({ ...form, variant_label: e.target.value })}
+                        className="input-dark"
+                      >
+                        <option value="">— Select variant —</option>
+                        {variants.map((v) => (
+                          <option key={v.label} value={v.label}>{v.label} — {v.months} month{v.months > 1 ? 's' : ''}</option>
+                        ))}
+                      </select>
+                      <p className="text-[11px] text-zinc-600 mt-1">Pick the duration this account covers so admin can match it to orders</p>
+                    </div>
+                  ) : null
+                })()}
 
                 {/* Mode toggle */}
                 <div className="flex gap-2">
