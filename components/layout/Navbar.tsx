@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
 import { motion, AnimatePresence } from 'framer-motion'
+import ThemeToggle from '@/components/ui/ThemeToggle'
 
 interface NavbarProps {
   user?: { name: string; role: string; wallet_balance: number } | null
@@ -82,6 +83,9 @@ export default function Navbar({ user }: NavbarProps) {
               >
                 <Search className="w-4.5 h-4.5" />
               </button>
+
+              {/* Theme Toggle */}
+              <ThemeToggle />
 
               {/* Cart */}
               <Link
