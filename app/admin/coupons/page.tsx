@@ -122,9 +122,9 @@ export default function AdminCouponsPage() {
             onClick={() => setShowForm(false)}
           >
             <motion.div
-              initial={{ scale: 0.95, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.95, y: 20 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
               className="bg-[#111113] border border-white/10 rounded-2xl w-full max-w-md p-6"
             >

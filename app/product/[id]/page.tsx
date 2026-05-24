@@ -139,8 +139,8 @@ export default function ProductPage() {
           {/* Left: Image + Trust badges */}
           <div className="space-y-4">
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               className="card-img rounded-2xl overflow-hidden h-52 sm:h-72 relative"
             >
               {getPlanLogo(plan.name, plan.image_url) ? (

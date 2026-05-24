@@ -119,9 +119,9 @@ export default function Navbar({ user }: NavbarProps) {
                   <AnimatePresence>
                     {userMenuOpen && (
                       <motion.div
-                        initial={{ opacity: 0, y: -8, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                        initial={{ opacity: 0, y: -6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -6 }}
                         transition={{ duration: 0.15 }}
                         className="absolute right-0 top-full mt-2 w-52 bg-zinc-900 rounded-xl border border-white/10 shadow-2xl shadow-black/60 overflow-hidden z-[200]"
                         onMouseLeave={() => setUserMenuOpen(false)}

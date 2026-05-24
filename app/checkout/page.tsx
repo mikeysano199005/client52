@@ -119,8 +119,8 @@ export default function CheckoutPage() {
       <div className="min-h-screen flex items-center justify-center px-4">
         <Navbar user={user ? { name: user.name, role: user.role, wallet_balance: user.wallet_balance } : null} />
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           className="text-center max-w-md"
         >
           <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
