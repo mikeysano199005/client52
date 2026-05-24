@@ -8,6 +8,7 @@ import { formatPrice } from '@/lib/utils'
 import { getPlanLogo, getPlanCardBg } from '@/lib/logos'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
+import SupportWidget from '@/components/support/SupportWidget'
 import toast from 'react-hot-toast'
 
 interface UserData {
@@ -429,6 +430,7 @@ export default function CheckoutPage() {
         </div>
       </main>
       <Footer />
+      <SupportWidget defaultSubject="Checkout / Payment Issue" />
     </div>
   )
 }

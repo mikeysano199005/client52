@@ -1,17 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { requireAdmin } from '@/lib/auth'
+import { requireAuth } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
 
-// GET /api/admin/support/[id]  — ticket + messages (marks user msgs as read)
+// GET /api/support/[id]  — full ticket + all messages
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await requireAdmin()
+    const user = await requireAuth()
     const { id } = await params
 
     const { data: ticket, error: te } = await supabaseAdmin
       .from('support_tickets')
-      .select('*, user:users(id, name, email)')
+      .select('*')
       .eq('id', id)
+      .eq('user_id', user.id)
       .single()
     if (te || !ticket) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
@@ -21,34 +22,15 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       .eq('ticket_id', id)
       .order('created_at', { ascending: true })
 
-    // Mark user messages as read
+    // Mark admin messages as read
     await supabaseAdmin
       .from('support_messages')
       .update({ is_read: true })
       .eq('ticket_id', id)
-      .eq('sender_type', 'user')
+      .eq('sender_type', 'admin')
       .eq('is_read', false)
 
     return NextResponse.json({ ticket, messages: messages ?? [] })
-  } catch {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-}
-
-// PATCH /api/admin/support/[id]  — update status
-export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  try {
-    await requireAdmin()
-    const { id } = await params
-    const body = await req.json()
-    const { data, error } = await supabaseAdmin
-      .from('support_tickets')
-      .update({ ...body, updated_at: new Date().toISOString() })
-      .eq('id', id)
-      .select()
-      .single()
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-    return NextResponse.json(data)
   } catch {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }

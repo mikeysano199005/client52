@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Package, ChevronLeft, RefreshCw, Copy, Eye, EyeOff, RotateCcw } from 'lucide-react'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
+import SupportWidget from '@/components/support/SupportWidget'
 import { formatPrice, formatDateTime, ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '@/lib/utils'
 import { getPlanLogo } from '@/lib/logos'
 import { useCartStore } from '@/store/cartStore'
@@ -312,6 +313,7 @@ export default function OrdersPage() {
         )}
       </main>
       <Footer />
+      <SupportWidget defaultSubject="Order Issue" />
     </div>
   )
 }

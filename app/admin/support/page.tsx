@@ -1,131 +1,213 @@
 'use client'
-
-import { useState, useEffect } from 'react'
-import { Headphones, MessageSquare, CheckCircle, Clock, AlertCircle, Send } from 'lucide-react'
+import { useState, useEffect, useCallback } from 'react'
+import { Headphones, MessageCircle, Loader2, ChevronLeft, CheckCircle } from 'lucide-react'
+import SupportChat from '@/components/support/SupportChat'
 import toast from 'react-hot-toast'
 
 interface Ticket {
   id: string
-  user_id: string
   subject: string
-  message: string
   status: 'open' | 'replied' | 'closed'
-  admin_reply?: string
-  created_at: string
-  user?: { name: string; email: string }
+  updated_at: string
+  user?: { id: string; name: string; email: string }
+  support_messages: Array<{ sender_type: string; message: string; is_read: boolean; created_at: string }>
+}
+
+const STATUS: Record<string, { label: string; dot: string; text: string }> = {
+  open:    { label: 'Open',    dot: 'bg-yellow-400', text: 'text-yellow-400' },
+  replied: { label: 'Replied', dot: 'bg-blue-400',   text: 'text-blue-400' },
+  closed:  { label: 'Closed',  dot: 'bg-zinc-500',   text: 'text-zinc-500' },
 }
 
 export default function AdminSupportPage() {
   const [tickets, setTickets] = useState<Ticket[]>([])
   const [loading, setLoading] = useState(true)
-  const [selected, setSelected] = useState<Ticket | null>(null)
-  const [reply, setReply] = useState('')
+  const [active, setActive] = useState<Ticket | null>(null)
   const [filter, setFilter] = useState<'all' | 'open' | 'replied' | 'closed'>('all')
+  const [closing, setClosing] = useState(false)
 
-  useEffect(() => { fetchTickets() }, [])
-
-  async function fetchTickets() {
+  const fetchTickets = useCallback(async (silent = false) => {
     try {
       const res = await fetch('/api/admin/support')
       const data = await res.json()
       setTickets(Array.isArray(data) ? data : [])
-    } catch {
-      setTickets([])
-    } finally {
-      setLoading(false)
-    }
-  }
+    } catch { setTickets([]) }
+    finally { if (!silent) setLoading(false) }
+  }, [])
 
-  async function handleReply(status: 'replied' | 'closed') {
-    if (!selected) return
-    const res = await fetch(`/api/admin/support/${selected.id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ admin_reply: reply, status }),
-    })
-    if (res.ok) {
-      toast.success(status === 'closed' ? 'Ticket closed' : 'Reply sent')
-      setSelected(null)
-      setReply('')
-      fetchTickets()
-    }
+  useEffect(() => { fetchTickets() }, [fetchTickets])
+
+  // Poll for new tickets every 10s
+  useEffect(() => {
+    const t = setInterval(() => fetchTickets(true), 10000)
+    return () => clearInterval(t)
+  }, [fetchTickets])
+
+  async function closeTicket() {
+    if (!active) return
+    setClosing(true)
+    try {
+      await fetch(`/api/admin/support/${active.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'closed' }),
+      })
+      setTickets(prev => prev.map(t => t.id === active.id ? { ...t, status: 'closed' } : t))
+      setActive(t => t ? { ...t, status: 'closed' } : t)
+      toast.success('Ticket closed')
+    } finally { setClosing(false) }
   }
 
   const filtered = filter === 'all' ? tickets : tickets.filter(t => t.status === filter)
+  const totalUnread = tickets.reduce((n, t) =>
+    n + t.support_messages.filter(m => m.sender_type === 'user' && !m.is_read).length, 0)
 
-  const statusConfig = {
-    open: { color: 'text-yellow-400 bg-yellow-500/20', icon: <Clock className="w-3 h-3" /> },
-    replied: { color: 'text-blue-400 bg-blue-500/20', icon: <MessageSquare className="w-3 h-3" /> },
-    closed: { color: 'text-green-400 bg-green-500/20', icon: <CheckCircle className="w-3 h-3" /> },
+  function lastMessage(t: Ticket) {
+    return [...t.support_messages].sort((a, b) =>
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0]
+  }
+
+  function timeAgo(iso: string) {
+    const diff = Date.now() - new Date(iso).getTime()
+    const m = Math.floor(diff / 60000)
+    if (m < 1) return 'just now'
+    if (m < 60) return `${m}m ago`
+    const h = Math.floor(m / 60)
+    if (h < 24) return `${h}h ago`
+    return `${Math.floor(h / 24)}d ago`
   }
 
   return (
-    <div className="p-4 sm:p-6 max-w-6xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-white">Support Tickets</h1>
-        <p className="text-zinc-500 text-sm mt-1">{tickets.filter(t => t.status === 'open').length} open tickets</p>
-      </div>
-
-      <div className="flex gap-2 mb-4">
-        {(['all', 'open', 'replied', 'closed'] as const).map(f => (
-          <button key={f} onClick={() => setFilter(f)} className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors capitalize ${filter === f ? 'bg-purple-600 text-white' : 'bg-zinc-800 text-zinc-400 hover:text-white'}`}>
-            {f} {f !== 'all' && `(${tickets.filter(t => t.status === f).length})`}
-          </button>
-        ))}
-      </div>
-
-      {loading ? (
-        <div className="space-y-3">{[...Array(4)].map((_, i) => <div key={i} className="h-20 bg-zinc-800 rounded-xl animate-pulse" />)}</div>
-      ) : filtered.length === 0 ? (
-        <div className="glass rounded-2xl p-16 text-center">
-          <Headphones className="w-12 h-12 text-zinc-600 mx-auto mb-3" />
-          <p className="text-zinc-500">No tickets found.</p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {filtered.map(t => (
-            <div key={t.id} className="glass rounded-xl p-4 hover:border-purple-500/30 border border-transparent transition-colors cursor-pointer" onClick={() => { setSelected(t); setReply(t.admin_reply || '') }}>
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-semibold text-white truncate">{t.subject}</span>
-                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${statusConfig[t.status].color}`}>
-                      {statusConfig[t.status].icon} {t.status}
-                    </span>
-                  </div>
-                  <p className="text-sm text-zinc-400 truncate">{t.message}</p>
-                  <p className="text-xs text-zinc-600 mt-1">{t.user?.name} · {t.user?.email} · {new Date(t.created_at).toLocaleDateString('en-IN')}</p>
-                </div>
-                <AlertCircle className="w-4 h-4 text-zinc-600 flex-shrink-0 mt-1" />
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {selected && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="glass rounded-2xl p-6 w-full max-w-lg">
-            <h2 className="text-lg font-bold text-white mb-1">{selected.subject}</h2>
-            <p className="text-xs text-zinc-500 mb-4">{selected.user?.name} ({selected.user?.email})</p>
-            <div className="bg-zinc-800/50 rounded-xl p-4 mb-4">
-              <p className="text-sm text-zinc-300">{selected.message}</p>
-            </div>
-            {selected.admin_reply && (
-              <div className="bg-purple-500/10 border border-purple-500/20 rounded-xl p-4 mb-4">
-                <p className="text-xs text-purple-400 font-medium mb-1">Previous Reply</p>
-                <p className="text-sm text-zinc-300">{selected.admin_reply}</p>
-              </div>
-            )}
-            <textarea value={reply} onChange={e => setReply(e.target.value)} rows={4} placeholder="Write your reply..." className="input-dark w-full resize-none mb-4" />
-            <div className="flex gap-3">
-              <button onClick={() => setSelected(null)} className="flex-1 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-sm transition-colors">Cancel</button>
-              <button onClick={() => handleReply('closed')} className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 text-white rounded-lg text-sm transition-colors">Close</button>
-              <button onClick={() => handleReply('replied')} className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors">
-                <Send className="w-4 h-4" /> Send Reply
+    <div className="flex h-screen">
+      {/* Left — Ticket list */}
+      <div className={`flex flex-col border-r border-white/10 bg-zinc-950 ${active ? 'hidden lg:flex lg:w-80 shrink-0' : 'w-full lg:w-80 lg:shrink-0'}`}>
+        {/* Header */}
+        <div className="px-5 py-4 border-b border-white/10 shrink-0">
+          <div className="flex items-center justify-between mb-3">
+            <h1 className="text-lg font-bold text-white flex items-center gap-2">
+              <Headphones className="w-5 h-5 text-purple-400" />
+              Support
+              {totalUnread > 0 && (
+                <span className="w-5 h-5 bg-purple-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  {totalUnread}
+                </span>
+              )}
+            </h1>
+          </div>
+          <div className="flex gap-1">
+            {(['all', 'open', 'replied', 'closed'] as const).map(f => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`px-2.5 py-1 rounded-lg text-xs font-medium capitalize transition-colors ${filter === f ? 'bg-purple-600/20 text-purple-300 border border-purple-500/30' : 'text-zinc-500 hover:text-white'}`}
+              >
+                {f}
               </button>
+            ))}
+          </div>
+        </div>
+
+        {/* List */}
+        <div className="flex-1 overflow-y-auto">
+          {loading ? (
+            <div className="flex items-center justify-center h-24">
+              <Loader2 className="w-5 h-5 animate-spin text-zinc-600" />
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full gap-2 text-center p-6">
+              <MessageCircle className="w-10 h-10 text-zinc-700" />
+              <p className="text-zinc-500 text-sm">No tickets yet</p>
+            </div>
+          ) : (
+            filtered.map(t => {
+              const last = lastMessage(t)
+              const unread = t.support_messages.filter(m => m.sender_type === 'user' && !m.is_read).length
+              const st = STATUS[t.status]
+              const isActive = active?.id === t.id
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => setActive(t)}
+                  className={`w-full px-4 py-3.5 flex items-start gap-3 text-left border-b border-white/5 transition-colors ${isActive ? 'bg-purple-600/10 border-l-2 border-l-purple-500' : 'hover:bg-white/5'}`}
+                >
+                  <div className="relative shrink-0 mt-0.5">
+                    <div className="w-9 h-9 rounded-full bg-zinc-800 flex items-center justify-center text-purple-400 text-sm font-bold">
+                      {t.user?.name?.[0]?.toUpperCase() || '?'}
+                    </div>
+                    <div className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-zinc-950 ${st.dot}`} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-1">
+                      <p className="text-sm font-medium text-white truncate">{t.subject}</p>
+                      <div className="flex items-center gap-1 shrink-0">
+                        {unread > 0 && (
+                          <span className="w-5 h-5 bg-purple-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                            {unread}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <p className="text-xs text-zinc-500 truncate mt-0.5">
+                      {t.user?.name} · {last ? last.message : 'No messages'}
+                    </p>
+                    <p className="text-[10px] text-zinc-700 mt-0.5">{timeAgo(t.updated_at)}</p>
+                  </div>
+                </button>
+              )
+            })
+          )}
+        </div>
+      </div>
+
+      {/* Right — Chat */}
+      {active ? (
+        <div className="flex-1 flex flex-col min-w-0 min-h-0">
+          {/* Chat header */}
+          <div className="px-5 py-3.5 border-b border-white/10 flex items-center gap-3 shrink-0 bg-zinc-950">
+            <button onClick={() => setActive(null)} className="lg:hidden text-zinc-400 hover:text-white transition-colors">
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <div className="w-9 h-9 rounded-full bg-zinc-800 flex items-center justify-center text-purple-400 text-sm font-bold shrink-0">
+              {active.user?.name?.[0]?.toUpperCase() || '?'}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-white truncate">{active.subject}</p>
+              <p className="text-xs text-zinc-500 truncate">{active.user?.name} · {active.user?.email}</p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <span className={`text-xs font-medium ${STATUS[active.status].text} capitalize`}>
+                ● {active.status}
+              </span>
+              {active.status !== 'closed' && (
+                <button
+                  onClick={closeTicket}
+                  disabled={closing}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 border border-white/10 text-zinc-400 hover:text-white rounded-lg text-xs transition-all disabled:opacity-50"
+                >
+                  {closing ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle className="w-3 h-3" />}
+                  Close
+                </button>
+              )}
             </div>
           </div>
+
+          {/* Chat body */}
+          <div className="flex-1 min-h-0 bg-[#09090b]">
+            <SupportChat
+              ticketId={active.id}
+              isAdmin
+              status={active.status}
+              onStatusChange={(s) => {
+                setActive(t => t ? { ...t, status: s as Ticket['status'] } : t)
+                setTickets(prev => prev.map(t => t.id === active.id ? { ...t, status: s as Ticket['status'] } : t))
+              }}
+            />
+          </div>
+        </div>
+      ) : (
+        <div className="flex-1 hidden lg:flex flex-col items-center justify-center gap-3 text-center p-8 bg-[#09090b]">
+          <MessageCircle className="w-14 h-14 text-zinc-800" />
+          <p className="text-zinc-600">Select a conversation to view</p>
         </div>
       )}
     </div>
