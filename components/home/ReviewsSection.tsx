@@ -48,11 +48,11 @@ export default function ReviewsSection({ reviews = MOCK_REVIEWS }: ReviewsSectio
         {displayReviews.slice(0, 6).map((review, i) => (
           <motion.div
             key={review.id}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: i * 0.08 }}
-            className="glass glass-hover rounded-xl p-5"
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ duration: 0.35, ease: 'easeOut' }}
+            className="glass rounded-xl p-5"
           >
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-3">
