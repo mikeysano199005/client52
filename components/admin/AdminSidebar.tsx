@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import {
   LayoutDashboard, Package, ShoppingBag, Users, Database,
   Tag, Image, Star, Settings, LogOut, Tv, ChevronRight,
-  UserCheck, Gift, BarChart2, ArrowLeftRight, Headphones, LayoutGrid, Menu, X, Wallet
+  UserCheck, Gift, BarChart2, ArrowLeftRight, Headphones, LayoutGrid, Menu, X, Wallet, Mail
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
@@ -25,6 +25,7 @@ const NAV = [
   { href: '/admin/transactions', label: 'Transactions', icon: <ArrowLeftRight className="w-4 h-4" /> },
   { href: '/admin/analytics', label: 'Revenue Analytics', icon: <BarChart2 className="w-4 h-4" /> },
   { href: '/admin/bonus', label: 'Bonus Settings', icon: <Gift className="w-4 h-4" /> },
+  { href: '/admin/emails', label: 'Email Broadcasts', icon: <Mail className="w-4 h-4" /> },
   { href: '/admin/support', label: 'Support Tickets', icon: <Headphones className="w-4 h-4" /> },
   { href: '/admin/settings', label: 'Settings', icon: <Settings className="w-4 h-4" /> },
 ]

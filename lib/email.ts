@@ -6,7 +6,10 @@ interface EmailPayload {
   html: string
 }
 
-async function sendEmail(payload: EmailPayload) {
+const BASE_STYLE = `font-family:sans-serif;max-width:600px;margin:0 auto;background:#09090b;color:#f4f4f5;padding:32px;border-radius:12px`
+const HEADER = `<h1 style="color:#8b5cf6;margin:0 0 4px">DIGITAL OTT</h1>`
+
+export async function sendEmail(payload: EmailPayload) {
   const apiKey = process.env.RESEND_API_KEY
   if (!apiKey) return
 
@@ -17,7 +20,7 @@ async function sendEmail(payload: EmailPayload) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: process.env.EMAIL_FROM || 'noreply@streamzone.in',
+      from: process.env.EMAIL_FROM || 'noreply@digitalott.in',
       to: payload.to,
       subject: payload.subject,
       html: payload.html,
@@ -72,6 +75,57 @@ export async function sendAccountDelivery(
           <p style="margin:0;color:#fbbf24">⚠️ Important: Do NOT change the email, password, or any account settings. Do NOT share credentials with others.</p>
         </div>
         <p style="color:#a1a1aa;font-size:14px">Order #${order.order_number} | Need help? Contact us on WhatsApp or Telegram.</p>
+      </div>
+    `,
+  })
+}
+
+export async function sendPaymentVerified(order: Order, userEmail: string, userName: string) {
+  await sendEmail({
+    to: userEmail,
+    subject: `Payment Verified - Order #${order.order_number} is Being Processed`,
+    html: `
+      <div style="${BASE_STYLE}">
+        ${HEADER}
+        <h2>Payment Verified! ✅</h2>
+        <p>Hi ${userName}, great news! Your payment has been verified and your order is now being processed.</p>
+        <div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:16px;margin:16px 0">
+          <p><strong>Order Number:</strong> #${order.order_number}</p>
+          <p><strong>Plan:</strong> ${order.plan_name}</p>
+          <p><strong>Amount:</strong> ₹${order.amount}</p>
+          <p><strong>Status:</strong> Processing 🔄</p>
+        </div>
+        <p>Your subscription credentials will be delivered shortly. We'll send you another email the moment it's ready!</p>
+        <p style="color:#a1a1aa;font-size:14px">Need help? Contact us on WhatsApp or Telegram.</p>
+      </div>
+    `,
+  })
+}
+
+export async function sendOrderCancelled(
+  order: Order,
+  userEmail: string,
+  userName: string,
+  adminNotes?: string
+) {
+  await sendEmail({
+    to: userEmail,
+    subject: `Order Cancelled - #${order.order_number}`,
+    html: `
+      <div style="${BASE_STYLE}">
+        ${HEADER}
+        <h2>Order Cancelled ❌</h2>
+        <p>Hi ${userName}, unfortunately your order has been cancelled.</p>
+        <div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:16px;margin:16px 0">
+          <p><strong>Order Number:</strong> #${order.order_number}</p>
+          <p><strong>Plan:</strong> ${order.plan_name}</p>
+          <p><strong>Amount:</strong> ₹${order.amount}</p>
+          ${adminNotes ? `<p><strong>Reason:</strong> ${adminNotes}</p>` : ''}
+        </div>
+        <div style="background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);border-radius:8px;padding:12px;margin:16px 0">
+          <p style="margin:0;color:#c4b5fd">💜 If you paid, a refund will be credited to your wallet within 24 hours. You can use it for future purchases.</p>
+        </div>
+        <p style="color:#a1a1aa;font-size:14px">Questions? Contact us on WhatsApp or Telegram — we're here to help.</p>
       </div>
     `,
   })

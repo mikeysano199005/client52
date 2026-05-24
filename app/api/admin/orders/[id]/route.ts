@@ -1,6 +1,6 @@
 import { supabaseAdmin } from '@/lib/supabase'
 import { requireAdmin } from '@/lib/auth'
-import { sendAccountDelivery } from '@/lib/email'
+import { sendAccountDelivery, sendPaymentVerified, sendOrderCancelled } from '@/lib/email'
 import { notifyLowStock } from '@/lib/telegram'
 
 export async function PATCH(
@@ -113,6 +113,17 @@ export async function PATCH(
       .single()
 
     if (error) return Response.json({ error: error.message }, { status: 500 })
+
+    // Trigger status-change emails
+    if (order.users) {
+      if (status === 'processing' && order.status !== 'processing') {
+        sendPaymentVerified(data, order.users.email, order.users.name).catch(() => null)
+      }
+      if (status === 'cancelled' && order.status !== 'cancelled') {
+        sendOrderCancelled(data, order.users.email, order.users.name, admin_notes).catch(() => null)
+      }
+    }
+
     return Response.json({ order: data })
   } catch {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
