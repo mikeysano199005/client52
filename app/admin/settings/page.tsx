@@ -1,7 +1,137 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { Settings, Save, MessageCircle, Send, CreditCard, Globe, Gift } from 'lucide-react'
+import { Settings, Save, MessageCircle, CreditCard, Globe, Gift, Users, UserPlus, Trash2, Crown, Shield } from 'lucide-react'
 import toast from 'react-hot-toast'
+
+interface TeamMember { id: string; name: string; email: string; role: string; created_at: string }
+
+function TeamSection() {
+  const [members, setMembers] = useState<TeamMember[]>([])
+  const [loading, setLoading] = useState(true)
+  const [isOwner, setIsOwner] = useState(false)
+  const [newEmail, setNewEmail] = useState('')
+  const [adding, setAdding] = useState(false)
+  const [removing, setRemoving] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetch('/api/auth/me').then(r => r.json()).then(d => {
+      if (d.user?.role === 'owner') {
+        setIsOwner(true)
+        fetchTeam()
+      } else {
+        // Admin can see list but not manage
+        fetchTeam()
+      }
+    })
+  }, [])
+
+  async function fetchTeam() {
+    setLoading(true)
+    const res = await fetch('/api/admin/team')
+    if (res.ok) setMembers(await res.json())
+    setLoading(false)
+  }
+
+  async function handleAdd(e: React.FormEvent) {
+    e.preventDefault()
+    if (!newEmail.trim()) return
+    setAdding(true)
+    const res = await fetch('/api/admin/team', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: newEmail.trim() }),
+    })
+    const data = await res.json()
+    if (res.ok) { toast.success('Admin added!'); setNewEmail(''); fetchTeam() }
+    else toast.error(data.error || 'Failed to add admin')
+    setAdding(false)
+  }
+
+  async function handleRemove(id: string, name: string) {
+    if (!confirm(`Remove ${name} as admin?`)) return
+    setRemoving(id)
+    const res = await fetch('/api/admin/team', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    })
+    const data = await res.json()
+    if (res.ok) { toast.success('Admin removed'); fetchTeam() }
+    else toast.error(data.error || 'Failed to remove')
+    setRemoving(null)
+  }
+
+  return (
+    <div className="glass rounded-xl overflow-hidden">
+      <div className="flex items-center gap-2 px-5 py-4 border-b border-white/10">
+        <Users className="w-4 h-4 text-cyan-400" />
+        <h2 className="font-bold text-white text-sm">Team Members</h2>
+      </div>
+      <div className="p-5 space-y-4">
+        {loading ? (
+          <div className="space-y-2">{[1,2].map(i => <div key={i} className="h-12 skeleton rounded-xl" />)}</div>
+        ) : (
+          <div className="space-y-2">
+            {members.map(m => (
+              <div key={m.id} className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/10">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${m.role === 'owner' ? 'bg-amber-500/20' : 'bg-purple-500/20'}`}>
+                    {m.role === 'owner'
+                      ? <Crown className="w-4 h-4 text-amber-400" />
+                      : <Shield className="w-4 h-4 text-purple-400" />
+                    }
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-white truncate">{m.name}</p>
+                    <p className="text-xs text-zinc-500 truncate">{m.email}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${m.role === 'owner' ? 'bg-amber-500/20 text-amber-400' : 'bg-purple-500/20 text-purple-400'}`}>
+                    {m.role.toUpperCase()}
+                  </span>
+                  {isOwner && m.role !== 'owner' && (
+                    <button
+                      onClick={() => handleRemove(m.id, m.name)}
+                      disabled={removing === m.id}
+                      className="p-1.5 text-red-400 hover:bg-red-400/10 rounded-lg transition-all disabled:opacity-50"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {isOwner && (
+          <form onSubmit={handleAdd} className="flex gap-2 pt-2">
+            <input
+              type="email"
+              value={newEmail}
+              onChange={e => setNewEmail(e.target.value)}
+              placeholder="Enter email to add as admin"
+              className="input-dark flex-1"
+              required
+            />
+            <button
+              type="submit"
+              disabled={adding}
+              className="flex items-center gap-1.5 px-4 py-2.5 bg-purple-600 hover:bg-purple-500 disabled:opacity-60 text-white text-sm font-semibold rounded-xl transition-all shrink-0"
+            >
+              <UserPlus className="w-4 h-4" />
+              {adding ? 'Adding...' : 'Add'}
+            </button>
+          </form>
+        )}
+        {!isOwner && (
+          <p className="text-xs text-zinc-600">Only the owner can add or remove admins.</p>
+        )}
+      </div>
+    </div>
+  )
+}
 
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<Record<string, string>>({})
@@ -116,6 +246,8 @@ export default function AdminSettingsPage() {
             </div>
           </div>
         ))}
+
+        <TeamSection />
 
         <div className="glass rounded-xl p-5">
           <h2 className="font-bold text-white text-sm mb-4">Danger Zone</h2>

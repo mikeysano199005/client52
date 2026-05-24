@@ -2,7 +2,7 @@ export interface User {
   id: string
   name: string
   email: string
-  role: 'user' | 'admin'
+  role: 'user' | 'admin' | 'owner'
   wallet_balance: number
   referral_code: string
   referred_by?: string

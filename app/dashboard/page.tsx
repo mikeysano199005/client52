@@ -4,11 +4,12 @@ import { supabaseAdmin } from '@/lib/supabase'
 import Link from 'next/link'
 import {
   ShoppingBag, Wallet, Users, Copy, ExternalLink,
-  TrendingUp, Clock, CheckCircle, Package
+  TrendingUp, Clock, CheckCircle, Package, LogOut
 } from 'lucide-react'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import FloatingButtons from '@/components/layout/FloatingButtons'
+import LogoutAllButton from '@/components/dashboard/LogoutAllButton'
 import { formatPrice, formatDateTime, ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '@/lib/utils'
 import type { Order } from '@/types'
 
@@ -159,6 +160,16 @@ export default async function DashboardPage() {
                   {formatPrice(referrals.filter((r) => r.status === 'credited').reduce((s: number, r: { reward_amount: number }) => s + r.reward_amount, 0))}
                 </span>
               </div>
+            </div>
+
+            {/* Account Security */}
+            <div className="glass rounded-xl p-5">
+              <h2 className="font-bold text-white text-sm mb-3 flex items-center gap-2">
+                <LogOut className="w-4 h-4 text-red-400" />
+                Account Security
+              </h2>
+              <p className="text-xs text-zinc-500 mb-3">Logged in on another device? Sign out everywhere.</p>
+              <LogoutAllButton />
             </div>
           </div>
         </div>

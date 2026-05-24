@@ -2,12 +2,13 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Package, ChevronLeft, RefreshCw, Copy, Eye, EyeOff } from 'lucide-react'
+import { Package, ChevronLeft, RefreshCw, Copy, Eye, EyeOff, RotateCcw } from 'lucide-react'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import { formatPrice, formatDateTime, ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '@/lib/utils'
 import { getPlanLogo } from '@/lib/logos'
-import type { Order } from '@/types'
+import { useCartStore } from '@/store/cartStore'
+import type { Order, PlanVariant } from '@/types'
 import toast from 'react-hot-toast'
 
 const STEPS = [
@@ -25,6 +26,7 @@ type FullOrder = Order & {
 }
 
 export default function OrdersPage() {
+  const { addItem } = useCartStore()
   const router = useRouter()
   const [user, setUser] = useState<UserData | null>(null)
   const [orders, setOrders] = useState<FullOrder[]>([])
@@ -84,6 +86,28 @@ export default function OrdersPage() {
   function copyText(text: string, label: string) {
     navigator.clipboard.writeText(text)
     toast.success(`${label} copied!`)
+  }
+
+  async function handleReorder(order: FullOrder) {
+    // Fetch the plan to get full plan object
+    const res = await fetch(`/api/plans/${order.plan_id}`).catch(() => null)
+    if (!res || !res.ok) {
+      toast.error('This plan is no longer available')
+      return
+    }
+    const { plan } = await res.json()
+    if (!plan) { toast.error('This plan is no longer available'); return }
+
+    // Find matching variant by label
+    const variant = order.plan_variant as PlanVariant
+    const matchedVariant = plan.price_variants?.find(
+      (v: PlanVariant) => v.label === variant?.label
+    ) || plan.price_variants?.[0]
+
+    if (!matchedVariant) { toast.error('This plan is no longer available'); return }
+
+    addItem(plan, matchedVariant)
+    toast.success(`${order.plan_name} added to cart! 🛒`)
   }
 
   return (
@@ -270,8 +294,16 @@ export default function OrdersPage() {
 
                   {/* Footer */}
                   <div className="px-5 py-3 flex items-center justify-between text-xs text-zinc-500">
-                    <span>Plan: {(order.plan_variant as { label?: string })?.label || '—'}</span>
-                    <span>Wallet used: {formatPrice(order.wallet_used)}</span>
+                    <span>Plan: {(order.plan_variant as { label?: string })?.label || '—'} • Wallet used: {formatPrice(order.wallet_used)}</span>
+                    {order.status !== 'cancelled' && (
+                      <button
+                        onClick={() => handleReorder(order)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-600/20 hover:bg-purple-600/40 border border-purple-500/30 text-purple-400 hover:text-purple-300 rounded-lg transition-all text-xs font-medium"
+                      >
+                        <RotateCcw className="w-3 h-3" />
+                        Re-order
+                      </button>
+                    )}
                   </div>
                 </div>
               )

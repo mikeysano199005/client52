@@ -97,6 +97,16 @@ export async function requireAuth(): Promise<User> {
 
 export async function requireAdmin(): Promise<User> {
   const user = await requireAuth()
-  if (user.role !== 'admin') throw new Error('Forbidden')
+  if (user.role !== 'admin' && user.role !== 'owner') throw new Error('Forbidden')
   return user
+}
+
+export async function requireOwner(): Promise<User> {
+  const user = await requireAuth()
+  if (user.role !== 'owner') throw new Error('Forbidden')
+  return user
+}
+
+export async function logoutAllSessions(userId: string): Promise<void> {
+  await supabaseAdmin.from('sessions').delete().eq('user_id', userId)
 }
