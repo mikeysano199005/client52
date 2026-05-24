@@ -20,26 +20,6 @@ const BADGE_CLASS: Record<string, string> = {
   'BEST DEAL': 'badge-deal',
 }
 
-const PLATFORM_COLORS: Record<string, string> = {
-  Netflix: 'from-red-900/40 to-zinc-900',
-  Amazon: 'from-blue-900/40 to-zinc-900',
-  Prime: 'from-blue-900/40 to-zinc-900',
-  Hotstar: 'from-blue-800/40 to-zinc-900',
-  Jio: 'from-indigo-900/40 to-zinc-900',
-  YouTube: 'from-red-900/40 to-zinc-900',
-  Zee5: 'from-purple-900/40 to-zinc-900',
-  Sony: 'from-blue-900/40 to-zinc-900',
-  Spotify: 'from-green-900/40 to-zinc-900',
-  Combo: 'from-purple-900/40 to-cyan-900/20',
-  OTT: 'from-purple-900/40 to-zinc-900',
-}
-
-function getPlatformGradient(name: string) {
-  for (const key of Object.keys(PLATFORM_COLORS)) {
-    if (name.toLowerCase().includes(key.toLowerCase())) return PLATFORM_COLORS[key]
-  }
-  return 'from-zinc-900 to-zinc-900'
-}
 
 export default function ProductCard({ plan, compact = false }: ProductCardProps) {
   const addItem = useCartStore((s) => s.addItem)
@@ -66,26 +46,31 @@ export default function ProductCard({ plan, compact = false }: ProductCardProps)
             compact ? 'p-0' : 'p-0'
           }`}
         >
-          {/* Image / Gradient area */}
+          {/* Image area */}
           <div
-            className={`relative bg-gradient-to-br ${getPlatformGradient(plan.name)} ${
-              compact ? 'h-32' : 'h-44'
+            className={`relative bg-[#111113] ${
+              compact ? 'h-28' : 'h-36'
             } flex items-center justify-center overflow-hidden`}
           >
+            {/* subtle dot grid */}
+            <div className="absolute inset-0 opacity-40" style={{ backgroundImage: 'radial-gradient(rgba(139,92,246,0.15) 1px, transparent 1px)', backgroundSize: '18px 18px' }} />
+
             {(() => {
               const logo = getPlanLogo(plan.name, plan.image_url)
               return logo ? (
-                <img
-                  src={logo}
-                  alt={plan.name}
-                  className="w-3/4 max-h-16 object-contain drop-shadow-lg"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden') }}
-                />
-              ) : null
+                <div className="relative z-10 bg-white rounded-2xl flex items-center justify-center shadow-md" style={{ width: 80, height: 80, padding: 10 }}>
+                  <img
+                    src={logo}
+                    alt={plan.name}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+              ) : (
+                <div className="relative z-10 w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600/40 to-cyan-600/20 border border-white/10 flex items-center justify-center text-2xl font-black text-white">
+                  {plan.name[0]}
+                </div>
+              )
             })()}
-            <div className={`w-16 h-16 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-2xl font-black text-white backdrop-blur-sm ${getPlanLogo(plan.name, plan.image_url) ? 'hidden' : ''}`}>
-              {plan.name[0]}
-            </div>
 
             {/* Badge */}
             {plan.badge && (
@@ -167,7 +152,7 @@ export default function ProductCard({ plan, compact = false }: ProductCardProps)
 export function ProductCardSkeleton() {
   return (
     <div className="glass rounded-xl overflow-hidden">
-      <div className="h-44 skeleton" />
+      <div className="h-36 skeleton" />
       <div className="p-3 space-y-2">
         <div className="h-4 skeleton w-3/4" />
         <div className="h-3 skeleton w-1/3" />

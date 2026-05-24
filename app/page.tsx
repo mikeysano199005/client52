@@ -72,15 +72,18 @@ export default async function HomePage() {
                   href={`/product/${plan.id}`}
                   className="glass glass-hover rounded-xl overflow-hidden group"
                 >
-                  <div className="h-32 bg-gradient-to-br from-purple-950/60 to-zinc-950 flex items-center justify-center relative overflow-hidden">
+                  <div className="h-28 bg-[#111113] flex items-center justify-center relative overflow-hidden">
+                    <div className="absolute inset-0 opacity-40" style={{ backgroundImage: 'radial-gradient(rgba(139,92,246,0.15) 1px, transparent 1px)', backgroundSize: '18px 18px' }} />
                     {getPlanLogo(plan.name, plan.image_url) ? (
-                      <img
-                        src={getPlanLogo(plan.name, plan.image_url)!}
-                        alt={plan.name}
-                        className="w-3/4 max-h-14 object-contain drop-shadow-lg"
-                      />
+                      <div className="relative z-10 bg-white rounded-xl flex items-center justify-center shadow-md" style={{ width: 64, height: 64, padding: 8 }}>
+                        <img
+                          src={getPlanLogo(plan.name, plan.image_url)!}
+                          alt={plan.name}
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
                     ) : (
-                      <div className="w-12 h-12 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-xl font-black text-white">
+                      <div className="relative z-10 w-12 h-12 rounded-xl bg-gradient-to-br from-purple-600/40 to-cyan-600/20 border border-white/10 flex items-center justify-center text-xl font-black text-white">
                         {plan.name[0]}
                       </div>
                     )}
