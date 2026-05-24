@@ -90,7 +90,7 @@ export default function AdminSidebar() {
   return (
     <>
       {/* Mobile top bar */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[#09090b]/95 backdrop-blur-xl border-b border-white/10 flex items-center justify-between px-4 h-14">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[#09090b] border-b border-white/10 flex items-center justify-between px-4 h-14">
         <Link href="/admin" className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center">
             <Tv className="w-3.5 h-3.5 text-white" />
@@ -118,7 +118,7 @@ export default function AdminSidebar() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="lg:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+              className="lg:hidden fixed inset-0 z-50 bg-black/70"
               onClick={() => setMobileOpen(false)}
             />
             <motion.div

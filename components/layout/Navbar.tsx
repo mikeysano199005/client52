@@ -48,7 +48,7 @@ export default function Navbar({ user }: NavbarProps) {
       <nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled
-            ? 'bg-[#09090b]/90 backdrop-blur-xl border-b border-white/10 shadow-lg shadow-black/20'
+            ? 'bg-[#09090b] border-b border-white/10 shadow-lg shadow-black/20'
             : 'bg-transparent'
         }`}
       >
@@ -179,7 +179,7 @@ export default function Navbar({ user }: NavbarProps) {
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              className="md:hidden bg-[#09090b]/95 backdrop-blur-xl border-t border-white/10 overflow-hidden"
+              className="md:hidden bg-[#09090b] border-t border-white/10 overflow-hidden"
             >
               <div className="px-4 py-4 flex flex-col gap-1">
                 <MobileNavLink href="/" label="Home" onClick={() => setMenuOpen(false)} />
@@ -205,7 +205,7 @@ export default function Navbar({ user }: NavbarProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm flex items-start justify-center pt-24 px-4"
+            className="fixed inset-0 z-[100] bg-black/80 flex items-start justify-center pt-24 px-4"
             onClick={() => setSearchOpen(false)}
           >
             <motion.div

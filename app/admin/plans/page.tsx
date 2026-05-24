@@ -247,7 +247,7 @@ export default function AdminPlansPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
           >
             <motion.div
               initial={{ scale: 0.95, y: 20 }}
@@ -255,7 +255,7 @@ export default function AdminPlansPage() {
               exit={{ scale: 0.95, y: 20 }}
               className="glass border border-white/10 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
             >
-              <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 sticky top-0 bg-zinc-950/90 backdrop-blur-sm z-10">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 sticky top-0 bg-zinc-950/90 z-10">
                 <h2 className="font-bold text-white">{editing ? 'Edit Plan' : 'Add New Plan'}</h2>
                 <button onClick={closeForm} className="text-zinc-500 hover:text-white p-1">
                   <X className="w-5 h-5" />

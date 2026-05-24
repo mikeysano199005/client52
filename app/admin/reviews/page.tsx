@@ -116,7 +116,7 @@ export default function AdminReviewsPage() {
       )}
 
       {replyModal && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
           <div className="glass rounded-2xl p-6 w-full max-w-md">
             <h2 className="text-xl font-bold text-white mb-2">Reply to Review</h2>
             <p className="text-sm text-zinc-400 mb-4">&quot;{replyModal.body}&quot;</p>

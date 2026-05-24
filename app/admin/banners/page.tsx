@@ -141,7 +141,7 @@ export default function AdminBannersPage() {
       )}
 
       {showModal && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
           <div className="glass rounded-2xl p-6 w-full max-w-lg">
             <h2 className="text-xl font-bold text-white mb-5">{editing ? 'Edit Banner' : 'New Banner'}</h2>
             <div className="space-y-4">

@@ -99,7 +99,7 @@ export default function AdminSupportPage() {
       )}
 
       {selected && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
           <div className="glass rounded-2xl p-6 w-full max-w-lg">
             <h2 className="text-lg font-bold text-white mb-1">{selected.subject}</h2>
             <p className="text-xs text-zinc-500 mb-4">{selected.user?.name} ({selected.user?.email})</p>

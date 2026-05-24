@@ -151,7 +151,7 @@ export default function ProductPage() {
                   onError={(e) => { const t = e.target as HTMLImageElement; t.style.display='none'; (t.nextElementSibling as HTMLElement)?.classList.remove('hidden') }}
                 />
               ) : null}
-              <div className={`w-24 h-24 rounded-3xl bg-white/10 border border-white/20 flex items-center justify-center text-5xl font-black text-white backdrop-blur-sm ${getPlanLogo(plan.name, plan.image_url) ? 'hidden' : ''}`}>
+              <div className={`w-24 h-24 rounded-3xl bg-white/10 border border-white/20 flex items-center justify-center text-5xl font-black text-white ${getPlanLogo(plan.name, plan.image_url) ? 'hidden' : ''}`}>
                 {plan.name[0]}
               </div>
               {plan.badge && (

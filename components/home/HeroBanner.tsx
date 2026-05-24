@@ -92,7 +92,7 @@ export default function HeroBanner({ plans, discountedPlans }: HeroBannerProps) 
                 {getPlanLogo(plan.name, plan.image_url) ? (
                   <img src={getPlanLogo(plan.name, plan.image_url)!} alt={plan.name} className="h-10 max-w-[180px] object-contain drop-shadow-lg" />
                 ) : (
-                  <div className="w-10 h-10 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center text-xl font-black text-white backdrop-blur-sm">
+                  <div className="w-10 h-10 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center text-xl font-black text-white">
                     {plan.name[0]}
                   </div>
                 )}
