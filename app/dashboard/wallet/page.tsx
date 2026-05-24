@@ -232,7 +232,7 @@ export default function WalletPage() {
               </div>
 
               {/* UPI payment info */}
-              <div className="bg-purple-600/10 border border-purple-500/20 rounded-xl p-4">
+              <div className="payment-upi-card bg-purple-600/10 border border-purple-500/20 rounded-xl p-4">
                 <p className="text-xs text-zinc-400 mb-3">Pay exactly <strong className="text-white">{amount > 0 ? formatPrice(amount) : '₹--'}</strong> to:</p>
                 <div className="flex items-center justify-between gap-2">
                   <div>

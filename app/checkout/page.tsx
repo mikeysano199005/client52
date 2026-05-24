@@ -200,7 +200,7 @@ export default function CheckoutPage() {
                 </div>
 
                 {/* UPI details */}
-                <div className="flex-1 bg-purple-600/10 border border-purple-500/20 rounded-xl p-4 flex flex-col justify-between">
+                <div className="payment-upi-card flex-1 bg-purple-600/10 border border-purple-500/20 rounded-xl p-4 flex flex-col justify-between">
                   <div>
                     <p className="text-xs text-zinc-400 mb-3">Pay using any UPI app:</p>
                     <div className="flex items-center justify-between gap-2 mb-3">

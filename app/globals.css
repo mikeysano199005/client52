@@ -263,6 +263,16 @@ html.light ::-webkit-scrollbar-track { background: #e4e4e7; }
 html.light ::-webkit-scrollbar-thumb { background: #a1a1aa; }
 html.light ::-webkit-scrollbar-thumb:hover { background: #8b5cf6; }
 
+/* ── Payment UPI card — always dark so white text is readable ── */
+html.light .payment-upi-card {
+  background: #1a0d30 !important;
+  border-color: rgba(139, 92, 246, 0.5) !important;
+}
+html.light .payment-upi-card [class~="text-white"]    { color: #ffffff !important; }
+html.light .payment-upi-card [class~="text-zinc-400"] { color: #c4b5fd !important; }
+html.light .payment-upi-card [class~="text-zinc-500"] { color: #a78bfa !important; }
+html.light .payment-upi-card [class~="text-zinc-600"] { color: #a78bfa !important; }
+
 /* ── Variant selector cards ── */
 html.light .variant-card {
   background: rgba(0, 0, 0, 0.04) !important;
