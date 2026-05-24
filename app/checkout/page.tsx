@@ -153,20 +153,24 @@ export default function CheckoutPage() {
             <div className="glass rounded-xl p-4">
               <h2 className="font-bold text-white mb-3 text-sm">Order Summary</h2>
               <div className="space-y-2.5 mb-3">
-                {items.map((item) => (
-                  <div key={`${item.plan.id}-${item.variant.label}`} className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-900/60 to-zinc-900 border border-white/10 flex items-center justify-center shrink-0 overflow-hidden p-1">
-                      {getPlanLogo(item.plan.name, item.plan.image_url) ? (
-                        <img src={getPlanLogo(item.plan.name, item.plan.image_url)!} alt={item.plan.name} className="w-full h-full object-contain" />
-                      ) : <span className="text-xs font-black text-white">{item.plan.name[0]}</span>}
+                {items.map((item) => {
+                  const coLogo = getPlanLogo(item.plan.name, item.plan.image_url)
+                  const coIsBuiltin = coLogo?.startsWith('/logos/')
+                  return (
+                    <div key={`${item.plan.id}-${item.variant.label}`} className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-900/60 to-zinc-900 border border-white/10 shrink-0 overflow-hidden">
+                        {coLogo ? (
+                          <img src={coLogo} alt={item.plan.name} className={`w-full h-full ${coIsBuiltin ? 'object-contain p-1' : 'object-cover'}`} />
+                        ) : <span className="w-full h-full flex items-center justify-center text-xs font-black text-white">{item.plan.name[0]}</span>}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white truncate text-xs font-medium">{item.plan.name}</p>
+                        <p className="text-zinc-500 text-xs">{item.variant.label}</p>
+                      </div>
+                      <span className="text-white shrink-0 text-sm font-semibold">{formatPrice(item.variant.price)}</span>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-white truncate text-xs font-medium">{item.plan.name}</p>
-                      <p className="text-zinc-500 text-xs">{item.variant.label}</p>
-                    </div>
-                    <span className="text-white shrink-0 text-sm font-semibold">{formatPrice(item.variant.price)}</span>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
               <div className="flex justify-between font-bold text-white border-t border-white/10 pt-2">
                 <span>Total</span>
@@ -355,20 +359,24 @@ export default function CheckoutPage() {
             <div className="glass rounded-xl p-5">
               <h2 className="font-bold text-white mb-4">Order Summary</h2>
               <div className="space-y-3 mb-4">
-                {items.map((item) => (
-                  <div key={`${item.plan.id}-${item.variant.label}`} className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-900/60 to-zinc-900 border border-white/10 flex items-center justify-center shrink-0 overflow-hidden p-1">
-                      {getPlanLogo(item.plan.name, item.plan.image_url) ? (
-                        <img src={getPlanLogo(item.plan.name, item.plan.image_url)!} alt={item.plan.name} className="w-full h-full object-contain" />
-                      ) : <span className="text-xs font-black text-white">{item.plan.name[0]}</span>}
+                {items.map((item) => {
+                  const dsLogo = getPlanLogo(item.plan.name, item.plan.image_url)
+                  const dsIsBuiltin = dsLogo?.startsWith('/logos/')
+                  return (
+                    <div key={`${item.plan.id}-${item.variant.label}`} className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-900/60 to-zinc-900 border border-white/10 shrink-0 overflow-hidden">
+                        {dsLogo ? (
+                          <img src={dsLogo} alt={item.plan.name} className={`w-full h-full ${dsIsBuiltin ? 'object-contain p-1' : 'object-cover'}`} />
+                        ) : <span className="w-full h-full flex items-center justify-center text-xs font-black text-white">{item.plan.name[0]}</span>}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white truncate text-sm">{item.plan.name}</p>
+                        <p className="text-zinc-500 text-xs">{item.variant.label}</p>
+                      </div>
+                      <span className="text-white shrink-0 text-sm font-semibold">{formatPrice(item.variant.price)}</span>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-white truncate text-sm">{item.plan.name}</p>
-                      <p className="text-zinc-500 text-xs">{item.variant.label}</p>
-                    </div>
-                    <span className="text-white shrink-0 text-sm font-semibold">{formatPrice(item.variant.price)}</span>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
 
               <div className="space-y-2 border-t border-white/10 pt-3">

@@ -138,20 +138,24 @@ export default function ProductPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
           {/* Left: Image + Trust badges */}
           <div className="space-y-4">
+            {(() => {
+              const detailLogo = getPlanLogo(plan.name, plan.image_url)
+              const detailIsBuiltin = detailLogo?.startsWith('/logos/')
+              return (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="card-img rounded-2xl overflow-hidden h-52 sm:h-72 relative"
             >
-              {getPlanLogo(plan.name, plan.image_url) ? (
+              {detailLogo ? (
                 <img
-                  src={getPlanLogo(plan.name, plan.image_url)!}
+                  src={detailLogo}
                   alt={plan.name}
-                  className="absolute inset-0 w-full h-full object-contain p-8"
+                  className={`absolute inset-0 w-full h-full ${detailIsBuiltin ? 'object-contain p-8' : 'object-cover'}`}
                   onError={(e) => { const t = e.target as HTMLImageElement; t.style.display='none'; (t.nextElementSibling as HTMLElement)?.classList.remove('hidden') }}
                 />
               ) : null}
-              <div className={`absolute inset-0 flex items-center justify-center ${getPlanLogo(plan.name, plan.image_url) ? 'hidden' : ''}`}>
+              <div className={`absolute inset-0 flex items-center justify-center ${detailLogo ? 'hidden' : ''}`}>
                 <div className="w-24 h-24 rounded-3xl bg-white/10 border border-white/20 flex items-center justify-center text-5xl font-black text-white">
                   {plan.name[0]}
                 </div>
@@ -167,6 +171,8 @@ export default function ProductPage() {
                 </span>
               )}
             </motion.div>
+              )
+            })()}
 
             {/* Trust badges */}
             <div className="grid grid-cols-3 gap-3">
@@ -459,14 +465,16 @@ export default function ProductPage() {
               {relatedPlans.slice(0, 5).map((p) => {
                 const v = p.price_variants[0]
                 if (!v) return null
+                const relLogo = getPlanLogo(p.name, p.image_url)
+                const relIsBuiltin = relLogo?.startsWith('/logos/')
                 return (
                   <Link key={p.id} href={`/product/${p.id}`} className="glass glass-hover rounded-xl overflow-hidden group">
                     <div className="card-img h-28 overflow-hidden relative">
-                      {getPlanLogo(p.name, p.image_url) ? (
-                        <img src={getPlanLogo(p.name, p.image_url)!} alt={p.name} className="absolute inset-0 w-full h-full object-contain p-4"
+                      {relLogo ? (
+                        <img src={relLogo} alt={p.name} className={`absolute inset-0 w-full h-full ${relIsBuiltin ? 'object-contain p-4' : 'object-cover'}`}
                           onError={(e) => { const t = e.target as HTMLImageElement; t.style.display='none'; (t.nextElementSibling as HTMLElement)?.classList.remove('hidden') }} />
                       ) : null}
-                      <div className={`absolute inset-0 flex items-center justify-center ${getPlanLogo(p.name, p.image_url) ? 'hidden' : ''}`}>
+                      <div className={`absolute inset-0 flex items-center justify-center ${relLogo ? 'hidden' : ''}`}>
                         <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-lg font-black text-white">{p.name[0]}</div>
                       </div>
                     </div>

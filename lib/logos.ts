@@ -11,7 +11,8 @@ const PLATFORM_LOGOS: [string, string][] = [
   ['jiocinema', '/logos/jiocinema.svg'],
   ['mx player', '/logos/mx.svg'],
   ['jio', '/logos/jiocinema.svg'],
-  ['apple', '/logos/netflix.svg'],
+  // Note: 'apple' removed — Apple TV+ plans should have image_url set by admin
+  // or they'll fall back to the letter placeholder (better than wrong logo)
 ]
 
 export function getPlanLogo(name: string, imageUrl?: string | null): string | null {

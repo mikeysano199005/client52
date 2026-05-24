@@ -37,12 +37,15 @@ export default function ProductCard({ plan, compact = false }: ProductCardProps)
   }
 
   const logo = getPlanLogo(plan.name, plan.image_url)
+  // Built-in SVG logos have transparent BGs — use contain on dark card.
+  // Custom uploaded images (product photos, white-bg logos) — use cover to fill the area.
+  const isBuiltinLogo = logo?.startsWith('/logos/')
 
   return (
     <Link href={`/product/${plan.id}`} className="block group">
       <div className="glass rounded-xl overflow-hidden transition-all duration-200 group-hover:-translate-y-1 group-hover:border-purple-500/30 group-hover:shadow-lg group-hover:shadow-purple-900/20">
 
-        {/* Image area — always dark so logos are readable */}
+        {/* Image area */}
         <div className={`card-img relative ${compact ? 'h-28' : 'h-36'} overflow-hidden`}>
 
           {logo ? (
@@ -50,7 +53,7 @@ export default function ProductCard({ plan, compact = false }: ProductCardProps)
               src={logo}
               alt={plan.name}
               loading="lazy"
-              className="absolute inset-0 w-full h-full object-contain p-5"
+              className={`absolute inset-0 w-full h-full ${isBuiltinLogo ? 'object-contain p-5' : 'object-cover'}`}
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">

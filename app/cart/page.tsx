@@ -50,7 +50,10 @@ export default function CartPage() {
             {/* Items */}
             <div className="lg:col-span-2 space-y-3">
               <AnimatePresence>
-                {items.map((item) => (
+                {items.map((item) => {
+                  const cartLogo = getPlanLogo(item.plan.name, item.plan.image_url)
+                  const cartLogoIsBuiltin = cartLogo?.startsWith('/logos/')
+                  return (
                   <motion.div
                     key={`${item.plan.id}-${item.variant.label}`}
                     initial={{ opacity: 0, x: -20 }}
@@ -59,11 +62,11 @@ export default function CartPage() {
                     className="glass rounded-xl p-3 sm:p-4 flex items-center gap-3"
                   >
                     <div className="card-img w-12 h-12 sm:w-14 sm:h-14 rounded-xl border border-white/10 shrink-0 overflow-hidden relative">
-                      {getPlanLogo(item.plan.name, item.plan.image_url) ? (
-                        <img src={getPlanLogo(item.plan.name, item.plan.image_url)!} alt={item.plan.name} className="absolute inset-0 w-full h-full object-contain p-1.5"
+                      {cartLogo ? (
+                        <img src={cartLogo} alt={item.plan.name} className={`absolute inset-0 w-full h-full ${cartLogoIsBuiltin ? 'object-contain p-1.5' : 'object-cover'}`}
                           onError={(e) => { const t = e.target as HTMLImageElement; t.style.display='none'; (t.nextElementSibling as HTMLElement)?.classList.remove('hidden') }} />
                       ) : null}
-                      <span className={`absolute inset-0 flex items-center justify-center text-lg font-black text-white ${getPlanLogo(item.plan.name, item.plan.image_url) ? 'hidden' : ''}`}>{item.plan.name[0]}</span>
+                      <span className={`absolute inset-0 flex items-center justify-center text-lg font-black text-white ${cartLogo ? 'hidden' : ''}`}>{item.plan.name[0]}</span>
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-white text-sm truncate">{item.plan.name}</p>
@@ -80,7 +83,8 @@ export default function CartPage() {
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </motion.div>
-                ))}
+                  )
+                })}
               </AnimatePresence>
             </div>
 
