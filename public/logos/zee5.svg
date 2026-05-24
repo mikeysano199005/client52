@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 80">
+  <defs>
+    <linearGradient id="z5g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6741FF"/>
+      <stop offset="100%" style="stop-color:#9B59F5"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="80" rx="12" fill="url(#z5g)"/>
+  <text x="100" y="52" font-family="Arial Black, sans-serif" font-size="36" font-weight="900" fill="white" text-anchor="middle" letter-spacing="2">ZEE5</text>
+</svg>

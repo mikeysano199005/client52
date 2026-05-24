@@ -1,65 +1,113 @@
-import Image from "next/image";
+import { supabaseAdmin } from '@/lib/supabase'
+import { getSession } from '@/lib/auth'
+import Navbar from '@/components/layout/Navbar'
+import Footer from '@/components/layout/Footer'
+import FloatingButtons from '@/components/layout/FloatingButtons'
+import HeroBanner from '@/components/home/HeroBanner'
+import CategoryRow from '@/components/home/CategoryRow'
+import TopSellers from '@/components/home/TopSellers'
+import PromoBanners from '@/components/home/PromoBanners'
+import ReviewsSection from '@/components/home/ReviewsSection'
+import FAQSection from '@/components/home/FAQSection'
+import type { Plan, Review } from '@/types'
 
-export default function Home() {
+async function getData() {
+  const [plansRes, reviewsRes, settingsRes] = await Promise.all([
+    supabaseAdmin.from('plans').select('*').eq('active', true).order('sort_order'),
+    supabaseAdmin.from('reviews').select('*').eq('active', true).order('created_at', { ascending: false }).limit(6),
+    supabaseAdmin.from('settings').select('key, value').in('key', ['whatsapp_number', 'telegram_username']),
+  ])
+
+  const plans = (plansRes.data || []) as Plan[]
+  const reviews = (reviewsRes.data || []) as Review[]
+  const settings: Record<string, string> = {}
+  for (const s of settingsRes.data || []) settings[s.key] = s.value
+
+  return { plans, reviews, settings }
+}
+
+export default async function HomePage() {
+  const [user, { plans, reviews, settings }] = await Promise.all([getSession(), getData()])
+
+  const featured = plans.filter((p) => p.featured)
+  const discounted = [...plans].sort((a, b) => {
+    const discA = a.price_variants[0]
+      ? (a.price_variants[0].original_price - a.price_variants[0].price) / a.price_variants[0].original_price
+      : 0
+    const discB = b.price_variants[0]
+      ? (b.price_variants[0].original_price - b.price_variants[0].price) / b.price_variants[0].original_price
+      : 0
+    return discB - discA
+  })
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+    <div className="min-h-screen">
+      <Navbar user={user ? { name: user.name, role: user.role, wallet_balance: user.wallet_balance } : null} />
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 pb-20">
+        <HeroBanner plans={featured} banners={[]} discountedPlans={discounted} />
+        <CategoryRow />
+        <TopSellers plans={plans} />
+        <PromoBanners />
+
+        {/* All Plans Grid */}
+        <section className="mt-12">
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <h2 className="text-xl font-bold text-white">All Plans</h2>
+              <p className="text-sm text-zinc-500">{plans.length} plans available</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+            {plans.map((plan) => {
+              const cheapest = plan.price_variants[0]
+              if (!cheapest) return null
+              const discount = Math.round(
+                ((cheapest.original_price - cheapest.price) / cheapest.original_price) * 100
+              )
+              return (
+                <a
+                  key={plan.id}
+                  href={`/product/${plan.id}`}
+                  className="glass glass-hover rounded-xl overflow-hidden group"
+                >
+                  <div className="h-32 bg-gradient-to-br from-purple-950/60 to-zinc-950 flex items-center justify-center relative">
+                    <div className="w-12 h-12 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-xl font-black text-white">
+                      {plan.name[0]}
+                    </div>
+                    {plan.badge && (
+                      <span className="absolute top-2 left-2 text-[9px] font-bold text-white bg-purple-600 px-1.5 py-0.5 rounded-full">
+                        {plan.badge}
+                      </span>
+                    )}
+                    {discount > 0 && (
+                      <span className="absolute top-2 right-2 text-[9px] font-bold text-white bg-green-600 px-1.5 py-0.5 rounded-full">
+                        -{discount}%
+                      </span>
+                    )}
+                  </div>
+                  <div className="p-2.5">
+                    <p className="text-xs font-semibold text-white truncate group-hover:text-purple-400 transition-colors">
+                      {plan.name}
+                    </p>
+                    <p className="text-sm font-bold text-white mt-1">₹{cheapest.price}</p>
+                    <p className="text-[10px] text-zinc-500 line-through">₹{cheapest.original_price}</p>
+                  </div>
+                </a>
+              )
+            })}
+          </div>
+        </section>
+
+        <ReviewsSection reviews={reviews} />
+        <FAQSection />
       </main>
+
+      <Footer />
+      <FloatingButtons
+        whatsappNumber={settings.whatsapp_number}
+        telegramUsername={settings.telegram_username}
+      />
     </div>
-  );
+  )
 }
