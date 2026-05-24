@@ -1,11 +1,11 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Tv, Eye, EyeOff, UserPlus, Gift } from 'lucide-react'
 import toast from 'react-hot-toast'
-import { Suspense } from 'react'
+import GoogleButton from '@/components/auth/GoogleButton'
 
 function SignupForm() {
   const [form, setForm] = useState({ name: '', email: '', password: '', referralCode: '' })
@@ -62,15 +62,26 @@ function SignupForm() {
               <Tv className="w-5 h-5 text-white" />
             </div>
             <span className="text-2xl font-bold">
-              <span className="gradient-text">Stream</span>
-              <span className="text-white">Zone</span>
+              <span className="gradient-text">DIGITAL</span>
+              <span className="text-white"> OTT</span>
             </span>
           </Link>
           <h1 className="text-2xl font-bold text-white">Create account</h1>
-          <p className="text-zinc-500 text-sm mt-1">Join 10,000+ happy customers</p>
+          <p className="text-zinc-500 text-sm mt-1">Join thousands of happy customers</p>
         </div>
 
         <div className="glass rounded-2xl p-6 border border-white/10">
+
+          {/* Google Sign Up */}
+          <GoogleButton label="Sign up with Google" />
+
+          {/* Divider */}
+          <div className="flex items-center gap-3 my-5">
+            <div className="flex-1 h-px bg-white/10" />
+            <span className="text-xs text-zinc-500">or sign up with email</span>
+            <div className="flex-1 h-px bg-white/10" />
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="text-xs font-medium text-zinc-400 block mb-1.5">Full Name</label>

@@ -1,17 +1,36 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Tv, Eye, EyeOff, LogIn } from 'lucide-react'
 import toast from 'react-hot-toast'
+import GoogleButton from '@/components/auth/GoogleButton'
 
-export default function LoginPage() {
+const OAUTH_ERRORS: Record<string, string> = {
+  google_cancelled: 'Google sign-in was cancelled.',
+  invalid_state: 'Security check failed. Please try again.',
+  token_exchange: 'Failed to connect with Google. Try again.',
+  no_email: 'Could not get email from Google.',
+  create_failed: 'Could not create account. Please try again.',
+  account_disabled: 'Your account has been disabled. Contact support.',
+  oauth_failed: 'Google sign-in failed. Please try again.',
+}
+
+function LoginForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPw, setShowPw] = useState(false)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const params = useSearchParams()
+
+  useEffect(() => {
+    const err = params.get('error')
+    if (err && OAUTH_ERRORS[err]) {
+      toast.error(OAUTH_ERRORS[err])
+    }
+  }, [params])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -54,8 +73,8 @@ export default function LoginPage() {
               <Tv className="w-5 h-5 text-white" />
             </div>
             <span className="text-2xl font-bold">
-              <span className="gradient-text">Stream</span>
-              <span className="text-white">Zone</span>
+              <span className="gradient-text">DIGITAL</span>
+              <span className="text-white"> OTT</span>
             </span>
           </Link>
           <h1 className="text-2xl font-bold text-white">Welcome back</h1>
@@ -64,6 +83,17 @@ export default function LoginPage() {
 
         {/* Card */}
         <div className="glass rounded-2xl p-6 border border-white/10">
+
+          {/* Google Sign In */}
+          <GoogleButton label="Sign in with Google" />
+
+          {/* Divider */}
+          <div className="flex items-center gap-3 my-5">
+            <div className="flex-1 h-px bg-white/10" />
+            <span className="text-xs text-zinc-500">or sign in with email</span>
+            <div className="flex-1 h-px bg-white/10" />
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="text-xs font-medium text-zinc-400 block mb-1.5">Email Address</label>
@@ -123,5 +153,13 @@ export default function LoginPage() {
         </div>
       </motion.div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#09090b]" />}>
+      <LoginForm />
+    </Suspense>
   )
 }
