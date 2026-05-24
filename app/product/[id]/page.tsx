@@ -229,9 +229,9 @@ export default function ProductPage() {
                     <button
                       key={v.label}
                       onClick={() => setSelectedVariant(v)}
-                      className={`p-3 rounded-xl border text-left transition-all ${
+                      className={`variant-card p-3 rounded-xl border text-left transition-all ${
                         isSelected
-                          ? 'border-purple-500 bg-purple-500/10 glow-purple-sm'
+                          ? 'variant-card-selected border-purple-500 bg-purple-500/10 glow-purple-sm'
                           : 'border-white/10 bg-white/5 hover:border-white/20'
                       }`}
                     >
