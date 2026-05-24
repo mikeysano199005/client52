@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Zap, Star } from 'lucide-react'
 import type { Plan, Banner } from '@/types'
 import { formatPrice } from '@/lib/utils'
-import { getPlanLogo } from '@/lib/logos'
+import { getPlanLogo, getPlanCardBg } from '@/lib/logos'
 
 interface HeroBannerProps {
   plans: Plan[]
@@ -170,13 +170,14 @@ export default function HeroBanner({ plans, discountedPlans }: HeroBannerProps) 
             const disc = Math.round(((v.original_price - v.price) / v.original_price) * 100)
             const hotLogo = getPlanLogo(p.name, p.image_url)
             const hotLogoIsBuiltin = hotLogo?.startsWith('/logos/')
+            const hotBg = hotLogoIsBuiltin ? getPlanCardBg(p.name) : '#111113'
             return (
               <Link
                 key={p.id}
                 href={`/product/${p.id}`}
                 className="flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors"
               >
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-900/60 to-zinc-900 border border-white/10 shrink-0 overflow-hidden flex items-center justify-center">
+                <div className="w-10 h-10 rounded-lg shrink-0 overflow-hidden flex items-center justify-center border border-white/10" style={{ background: hotBg }}>
                   {hotLogo
                     ? <img src={hotLogo} alt={p.name} className={`w-full h-full ${hotLogoIsBuiltin ? 'object-contain p-1.5' : 'object-cover'}`} />
                     : <span className="text-sm font-black text-white">{p.name[0]}</span>

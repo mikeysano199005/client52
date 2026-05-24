@@ -4,7 +4,7 @@ import { Star, ShoppingCart } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
 import type { Plan } from '@/types'
 import { formatPrice, getDiscount } from '@/lib/utils'
-import { getPlanLogo } from '@/lib/logos'
+import { getPlanLogo, getPlanCardBg } from '@/lib/logos'
 import toast from 'react-hot-toast'
 import dynamic from 'next/dynamic'
 
@@ -37,17 +37,20 @@ export default function ProductCard({ plan, compact = false }: ProductCardProps)
   }
 
   const logo = getPlanLogo(plan.name, plan.image_url)
-  // Built-in SVG logos have transparent BGs — use contain on dark card.
-  // Custom uploaded images (product photos, white-bg logos) — use cover to fill the area.
+  // Built-in SVG logos: contain, shown on brand-colored dark gradient bg
+  // Custom uploaded images: cover the full area (no bg issue)
   const isBuiltinLogo = logo?.startsWith('/logos/')
+  const cardBg = isBuiltinLogo ? getPlanCardBg(plan.name) : '#111113'
 
   return (
     <Link href={`/product/${plan.id}`} className="block group">
       <div className="glass rounded-xl overflow-hidden transition-all duration-200 group-hover:-translate-y-1 group-hover:border-purple-500/30 group-hover:shadow-lg group-hover:shadow-purple-900/20">
 
-        {/* Image area */}
-        <div className={`card-img relative ${compact ? 'h-28' : 'h-36'} overflow-hidden`}>
-
+        {/* Image area — inline style ensures dark brand bg in both light/dark mode */}
+        <div
+          className={`relative ${compact ? 'h-28' : 'h-36'} overflow-hidden`}
+          style={{ background: cardBg }}
+        >
           {logo ? (
             <img
               src={logo}

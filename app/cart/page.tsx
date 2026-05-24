@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ShoppingCart, Trash2, ArrowRight, Zap, Tag } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
 import { formatPrice } from '@/lib/utils'
-import { getPlanLogo } from '@/lib/logos'
+import { getPlanLogo, getPlanCardBg } from '@/lib/logos'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import FloatingButtons from '@/components/layout/FloatingButtons'
@@ -53,6 +53,7 @@ export default function CartPage() {
                 {items.map((item) => {
                   const cartLogo = getPlanLogo(item.plan.name, item.plan.image_url)
                   const cartLogoIsBuiltin = cartLogo?.startsWith('/logos/')
+                  const cartBg = cartLogoIsBuiltin ? getPlanCardBg(item.plan.name) : '#111113'
                   return (
                   <motion.div
                     key={`${item.plan.id}-${item.variant.label}`}
@@ -61,7 +62,7 @@ export default function CartPage() {
                     exit={{ opacity: 0, x: 20, height: 0 }}
                     className="glass rounded-xl p-3 sm:p-4 flex items-center gap-3"
                   >
-                    <div className="card-img w-12 h-12 sm:w-14 sm:h-14 rounded-xl border border-white/10 shrink-0 overflow-hidden relative">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl border border-white/10 shrink-0 overflow-hidden relative" style={{ background: cartBg }}>
                       {cartLogo ? (
                         <img src={cartLogo} alt={item.plan.name} className={`absolute inset-0 w-full h-full ${cartLogoIsBuiltin ? 'object-contain p-1.5' : 'object-cover'}`}
                           onError={(e) => { const t = e.target as HTMLImageElement; t.style.display='none'; (t.nextElementSibling as HTMLElement)?.classList.remove('hidden') }} />

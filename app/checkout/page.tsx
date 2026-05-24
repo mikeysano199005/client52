@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import { Upload, Tag, Wallet, CheckCircle, AlertCircle, Copy } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
 import { formatPrice } from '@/lib/utils'
-import { getPlanLogo } from '@/lib/logos'
+import { getPlanLogo, getPlanCardBg } from '@/lib/logos'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import toast from 'react-hot-toast'
@@ -156,9 +156,10 @@ export default function CheckoutPage() {
                 {items.map((item) => {
                   const coLogo = getPlanLogo(item.plan.name, item.plan.image_url)
                   const coIsBuiltin = coLogo?.startsWith('/logos/')
+                  const coBg = coIsBuiltin ? getPlanCardBg(item.plan.name) : '#111113'
                   return (
                     <div key={`${item.plan.id}-${item.variant.label}`} className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-900/60 to-zinc-900 border border-white/10 shrink-0 overflow-hidden">
+                      <div className="w-9 h-9 rounded-lg border border-white/10 shrink-0 overflow-hidden" style={{ background: coBg }}>
                         {coLogo ? (
                           <img src={coLogo} alt={item.plan.name} className={`w-full h-full ${coIsBuiltin ? 'object-contain p-1' : 'object-cover'}`} />
                         ) : <span className="w-full h-full flex items-center justify-center text-xs font-black text-white">{item.plan.name[0]}</span>}
@@ -362,9 +363,10 @@ export default function CheckoutPage() {
                 {items.map((item) => {
                   const dsLogo = getPlanLogo(item.plan.name, item.plan.image_url)
                   const dsIsBuiltin = dsLogo?.startsWith('/logos/')
+                  const dsBg = dsIsBuiltin ? getPlanCardBg(item.plan.name) : '#111113'
                   return (
                     <div key={`${item.plan.id}-${item.variant.label}`} className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-900/60 to-zinc-900 border border-white/10 shrink-0 overflow-hidden">
+                      <div className="w-9 h-9 rounded-lg border border-white/10 shrink-0 overflow-hidden" style={{ background: dsBg }}>
                         {dsLogo ? (
                           <img src={dsLogo} alt={item.plan.name} className={`w-full h-full ${dsIsBuiltin ? 'object-contain p-1' : 'object-cover'}`} />
                         ) : <span className="w-full h-full flex items-center justify-center text-xs font-black text-white">{item.plan.name[0]}</span>}

@@ -9,7 +9,7 @@ import {
 } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
 import { formatPrice, getDiscount, ORDER_STATUS_LABELS } from '@/lib/utils'
-import { getPlanLogo } from '@/lib/logos'
+import { getPlanLogo, getPlanCardBg } from '@/lib/logos'
 import type { Plan, PlanVariant, Review } from '@/types'
 import toast from 'react-hot-toast'
 import Navbar from '@/components/layout/Navbar'
@@ -141,11 +141,13 @@ export default function ProductPage() {
             {(() => {
               const detailLogo = getPlanLogo(plan.name, plan.image_url)
               const detailIsBuiltin = detailLogo?.startsWith('/logos/')
+              const detailBg = detailIsBuiltin ? getPlanCardBg(plan.name) : '#111113'
               return (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="card-img rounded-2xl overflow-hidden h-52 sm:h-72 relative"
+              className="rounded-2xl overflow-hidden h-52 sm:h-72 relative"
+              style={{ background: detailBg }}
             >
               {detailLogo ? (
                 <img
@@ -467,9 +469,10 @@ export default function ProductPage() {
                 if (!v) return null
                 const relLogo = getPlanLogo(p.name, p.image_url)
                 const relIsBuiltin = relLogo?.startsWith('/logos/')
+                const relBg = relIsBuiltin ? getPlanCardBg(p.name) : '#111113'
                 return (
                   <Link key={p.id} href={`/product/${p.id}`} className="glass glass-hover rounded-xl overflow-hidden group">
-                    <div className="card-img h-28 overflow-hidden relative">
+                    <div className="h-28 overflow-hidden relative" style={{ background: relBg }}>
                       {relLogo ? (
                         <img src={relLogo} alt={p.name} className={`absolute inset-0 w-full h-full ${relIsBuiltin ? 'object-contain p-4' : 'object-cover'}`}
                           onError={(e) => { const t = e.target as HTMLImageElement; t.style.display='none'; (t.nextElementSibling as HTMLElement)?.classList.remove('hidden') }} />
