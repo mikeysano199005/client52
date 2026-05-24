@@ -34,6 +34,7 @@ export interface Plan {
   active: boolean
   featured: boolean
   sort_order: number
+  countdown_ends_at?: string | null
   created_at: string
 }
 

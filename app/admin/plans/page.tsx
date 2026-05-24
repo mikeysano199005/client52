@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Edit2, Trash2, X, Star, Upload, ImageIcon } from 'lucide-react'
+import { Plus, Edit2, Trash2, X, Star, Upload, ImageIcon, Timer } from 'lucide-react'
 import type { Plan, PlanVariant } from '@/types'
 import { formatPrice } from '@/lib/utils'
 import toast from 'react-hot-toast'
@@ -10,7 +10,7 @@ const CATEGORIES = ['OTT', 'Combos', 'Games', 'VPN', 'Utilities', 'Premium', 'Di
 const BADGES = ['', 'HOT', 'NEW', 'BEST VALUE', 'BEST DEAL']
 
 const EMPTY_VARIANT: PlanVariant = { label: '1 Month', months: 1, price: 0, original_price: 0, quality: '1080p HD', access: '1 Screen' }
-const EMPTY_PLAN = { name: '', category: 'OTT', description: '', badge: '', featured: false, active: true, sort_order: 0, image_url: '', price_variants: [{ ...EMPTY_VARIANT }] }
+const EMPTY_PLAN = { name: '', category: 'OTT', description: '', badge: '', featured: false, active: true, sort_order: 0, image_url: '', countdown_ends_at: null as string | null, price_variants: [{ ...EMPTY_VARIANT }] }
 
 export default function AdminPlansPage() {
   const [plans, setPlans] = useState<Plan[]>([])
@@ -25,6 +25,11 @@ export default function AdminPlansPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [dragOver, setDragOver] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Countdown state (h/m/s to add from now when saving)
+  const [cdHours, setCdHours] = useState(0)
+  const [cdMinutes, setCdMinutes] = useState(0)
+  const [cdSeconds, setCdSeconds] = useState(0)
 
   useEffect(() => { loadPlans() }, [])
 
@@ -46,10 +51,17 @@ export default function AdminPlansPage() {
     setImagePreview(null)
   }
 
+  function resetCountdown() {
+    setCdHours(0)
+    setCdMinutes(0)
+    setCdSeconds(0)
+  }
+
   function openCreate() {
     setEditing(null)
     setForm({ ...EMPTY_PLAN, price_variants: [{ ...EMPTY_VARIANT }] })
     resetImageState()
+    resetCountdown()
     setShowForm(true)
   }
 
@@ -59,15 +71,18 @@ export default function AdminPlansPage() {
       name: plan.name, category: plan.category, description: plan.description || '',
       badge: plan.badge || '', featured: plan.featured, active: plan.active,
       sort_order: plan.sort_order, image_url: plan.image_url || '',
+      countdown_ends_at: plan.countdown_ends_at ?? null,
       price_variants: plan.price_variants,
     })
     resetImageState()
+    resetCountdown()
     setShowForm(true)
   }
 
   function closeForm() {
     setShowForm(false)
     resetImageState()
+    resetCountdown()
   }
 
   function handleFileSelect(file: File) {
@@ -128,12 +143,18 @@ export default function AdminPlansPage() {
       finalImageUrl = url
     }
 
+    // Compute countdown_ends_at from h/m/s inputs
+    const totalSeconds = cdHours * 3600 + cdMinutes * 60 + cdSeconds
+    const finalCountdownEndsAt = totalSeconds > 0
+      ? new Date(Date.now() + totalSeconds * 1000).toISOString()
+      : form.countdown_ends_at  // preserve existing if no new values entered
+
     const method = editing ? 'PATCH' : 'POST'
     const url = editing ? `/api/admin/plans/${editing.id}` : '/api/admin/plans'
     const res = await fetch(url, {
       method,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...form, image_url: finalImageUrl }),
+      body: JSON.stringify({ ...form, image_url: finalImageUrl, countdown_ends_at: finalCountdownEndsAt }),
     })
     if (res.ok) {
       toast.success(editing ? 'Plan updated!' : 'Plan created!')
@@ -359,6 +380,75 @@ export default function AdminPlansPage() {
                       <p className="text-sm text-zinc-400 font-medium">Click to upload or drag & drop</p>
                       <p className="text-xs text-zinc-600 mt-1">JPG, JPEG, PNG — max 3 MB</p>
                     </div>
+                  )}
+                </div>
+
+                {/* Countdown Timer */}
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Timer className="w-4 h-4 text-orange-400" />
+                    <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Countdown Timer</label>
+                  </div>
+
+                  {/* Show active countdown if one exists */}
+                  {form.countdown_ends_at && new Date(form.countdown_ends_at) > new Date() && (
+                    <div className="flex items-center justify-between bg-orange-500/10 border border-orange-500/20 rounded-xl px-4 py-2.5 mb-3">
+                      <div>
+                        <p className="text-xs text-orange-400 font-medium">Active countdown</p>
+                        <p className="text-[11px] text-zinc-400 mt-0.5">
+                          Ends: {new Date(form.countdown_ends_at).toLocaleString()}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setForm((f) => ({ ...f, countdown_ends_at: null }))}
+                        className="text-xs text-red-400 hover:text-red-300 border border-red-400/30 hover:border-red-400/60 px-2.5 py-1 rounded-lg transition-all"
+                      >
+                        Clear
+                      </button>
+                    </div>
+                  )}
+
+                  <p className="text-[11px] text-zinc-500 mb-2">Set a new countdown from now:</p>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <label className="text-[10px] text-zinc-500 block mb-1">Hours</label>
+                      <input
+                        type="number"
+                        min={0}
+                        max={999}
+                        value={cdHours}
+                        onChange={(e) => setCdHours(Math.max(0, Number(e.target.value)))}
+                        className="input-dark text-sm py-2"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-zinc-500 block mb-1">Minutes</label>
+                      <input
+                        type="number"
+                        min={0}
+                        max={59}
+                        value={cdMinutes}
+                        onChange={(e) => setCdMinutes(Math.max(0, Math.min(59, Number(e.target.value))))}
+                        className="input-dark text-sm py-2"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-zinc-500 block mb-1">Seconds</label>
+                      <input
+                        type="number"
+                        min={0}
+                        max={59}
+                        value={cdSeconds}
+                        onChange={(e) => setCdSeconds(Math.max(0, Math.min(59, Number(e.target.value))))}
+                        className="input-dark text-sm py-2"
+                      />
+                    </div>
+                  </div>
+                  {(cdHours + cdMinutes + cdSeconds) > 0 && (
+                    <p className="text-[11px] text-orange-400 mt-2">
+                      Will set countdown for {cdHours}h {cdMinutes}m {cdSeconds}s from save time
+                    </p>
                   )}
                 </div>
 

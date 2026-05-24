@@ -7,6 +7,9 @@ import type { Plan } from '@/types'
 import { formatPrice, getDiscount } from '@/lib/utils'
 import { getPlanLogo } from '@/lib/logos'
 import toast from 'react-hot-toast'
+import dynamic from 'next/dynamic'
+
+const Countdown = dynamic(() => import('@/components/ui/Countdown'), { ssr: false })
 
 interface ProductCardProps {
   plan: Plan
@@ -96,6 +99,13 @@ export default function ProductCard({ plan, compact = false }: ProductCardProps)
                 <span className="text-xs font-semibold text-zinc-300 bg-zinc-800 px-3 py-1 rounded-full">
                   Out of Stock
                 </span>
+              </div>
+            )}
+
+            {/* Countdown */}
+            {plan.countdown_ends_at && new Date(plan.countdown_ends_at) > new Date() && (
+              <div className="absolute bottom-0 left-0 right-0 flex justify-center pb-1.5">
+                <Countdown endsAt={plan.countdown_ends_at} compact />
               </div>
             )}
           </div>

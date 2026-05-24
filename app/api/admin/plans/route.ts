@@ -28,6 +28,7 @@ export async function POST(req: Request) {
         sort_order: body.sort_order ?? 0,
         price_variants: body.price_variants,
         image_url: body.image_url || null,
+        countdown_ends_at: body.countdown_ends_at || null,
       })
       .select()
       .single()
