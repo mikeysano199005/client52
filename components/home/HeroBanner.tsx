@@ -5,32 +5,12 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Zap, Star } from 'lucide-react'
 import type { Plan, Banner } from '@/types'
 import { formatPrice } from '@/lib/utils'
+import { getPlanLogo } from '@/lib/logos'
 
 interface HeroBannerProps {
   plans: Plan[]
   banners: Banner[]
   discountedPlans: Plan[]
-}
-
-const PLATFORM_LOGOS: [string, string][] = [
-  ['netflix', '/logos/netflix.svg'],
-  ['amazon', '/logos/prime.svg'],
-  ['prime', '/logos/prime.svg'],
-  ['hotstar', '/logos/hotstar.svg'],
-  ['disney', '/logos/hotstar.svg'],
-  ['youtube', '/logos/youtube.svg'],
-  ['zee5', '/logos/zee5.svg'],
-  ['sony', '/logos/sonyliv.svg'],
-  ['spotify', '/logos/spotify.svg'],
-]
-
-function getPlanLogo(plan: Plan): string | null {
-  const lower = plan.name.toLowerCase()
-  for (const [key, logo] of PLATFORM_LOGOS) {
-    if (lower.includes(key)) return logo
-  }
-  if (plan.image_url) return plan.image_url
-  return null
 }
 
 const PLATFORM_GRADIENTS: Record<string, string> = {
@@ -109,15 +89,15 @@ export default function HeroBanner({ plans, discountedPlans }: HeroBannerProps) 
             >
               {/* Platform logo */}
               <div className="flex items-center gap-3 mb-3">
-                {getPlanLogo(plan) ? (
-                  <img src={getPlanLogo(plan)!} alt={plan.name} className="h-10 max-w-[180px] object-contain drop-shadow-lg" />
+                {getPlanLogo(plan.name, plan.image_url) ? (
+                  <img src={getPlanLogo(plan.name, plan.image_url)!} alt={plan.name} className="h-10 max-w-[180px] object-contain drop-shadow-lg" />
                 ) : (
                   <div className="w-10 h-10 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center text-xl font-black text-white backdrop-blur-sm">
                     {plan.name[0]}
                   </div>
                 )}
                 <div>
-                  <h2 className="text-lg sm:text-2xl lg:text-3xl font-black text-white tracking-tight">{getPlanLogo(plan) ? '' : plan.name}</h2>
+                  <h2 className="text-lg sm:text-2xl lg:text-3xl font-black text-white tracking-tight">{getPlanLogo(plan.name, plan.image_url) ? '' : plan.name}</h2>
                   <div className="flex items-center gap-2 text-xs text-zinc-400">
                     <span>{cheapest?.quality}</span>
                     <span>•</span>
@@ -195,8 +175,8 @@ export default function HeroBanner({ plans, discountedPlans }: HeroBannerProps) 
                 className="flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors"
               >
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-900/60 to-zinc-900 border border-white/10 flex items-center justify-center shrink-0 overflow-hidden p-1.5">
-                  {getPlanLogo(p)
-                    ? <img src={getPlanLogo(p)!} alt={p.name} className="w-full h-full object-contain" />
+                  {getPlanLogo(p.name, p.image_url)
+                    ? <img src={getPlanLogo(p.name, p.image_url)!} alt={p.name} className="w-full h-full object-contain" />
                     : <span className="text-sm font-black text-white">{p.name[0]}</span>
                   }
                 </div>

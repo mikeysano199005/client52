@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { Upload, Tag, Wallet, CheckCircle, AlertCircle, Copy } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
 import { formatPrice } from '@/lib/utils'
+import { getPlanLogo } from '@/lib/logos'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import toast from 'react-hot-toast'
@@ -151,11 +152,16 @@ export default function CheckoutPage() {
           <div className="lg:hidden space-y-4">
             <div className="glass rounded-xl p-4">
               <h2 className="font-bold text-white mb-3 text-sm">Order Summary</h2>
-              <div className="space-y-2 mb-3">
+              <div className="space-y-2.5 mb-3">
                 {items.map((item) => (
-                  <div key={`${item.plan.id}-${item.variant.label}`} className="flex justify-between text-sm">
-                    <div className="min-w-0 mr-2">
-                      <p className="text-white truncate text-xs">{item.plan.name}</p>
+                  <div key={`${item.plan.id}-${item.variant.label}`} className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-900/60 to-zinc-900 border border-white/10 flex items-center justify-center shrink-0 overflow-hidden p-1">
+                      {getPlanLogo(item.plan.name, item.plan.image_url) ? (
+                        <img src={getPlanLogo(item.plan.name, item.plan.image_url)!} alt={item.plan.name} className="w-full h-full object-contain" />
+                      ) : <span className="text-xs font-black text-white">{item.plan.name[0]}</span>}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white truncate text-xs font-medium">{item.plan.name}</p>
                       <p className="text-zinc-500 text-xs">{item.variant.label}</p>
                     </div>
                     <span className="text-white shrink-0 text-sm font-semibold">{formatPrice(item.variant.price)}</span>
@@ -350,12 +356,17 @@ export default function CheckoutPage() {
               <h2 className="font-bold text-white mb-4">Order Summary</h2>
               <div className="space-y-3 mb-4">
                 {items.map((item) => (
-                  <div key={`${item.plan.id}-${item.variant.label}`} className="flex justify-between text-sm">
-                    <div className="min-w-0 mr-2">
-                      <p className="text-white truncate">{item.plan.name}</p>
+                  <div key={`${item.plan.id}-${item.variant.label}`} className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-900/60 to-zinc-900 border border-white/10 flex items-center justify-center shrink-0 overflow-hidden p-1">
+                      {getPlanLogo(item.plan.name, item.plan.image_url) ? (
+                        <img src={getPlanLogo(item.plan.name, item.plan.image_url)!} alt={item.plan.name} className="w-full h-full object-contain" />
+                      ) : <span className="text-xs font-black text-white">{item.plan.name[0]}</span>}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white truncate text-sm">{item.plan.name}</p>
                       <p className="text-zinc-500 text-xs">{item.variant.label}</p>
                     </div>
-                    <span className="text-white shrink-0">{formatPrice(item.variant.price)}</span>
+                    <span className="text-white shrink-0 text-sm font-semibold">{formatPrice(item.variant.price)}</span>
                   </div>
                 ))}
               </div>

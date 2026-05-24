@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ShoppingCart, Trash2, ArrowRight, Zap, Tag } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
 import { formatPrice } from '@/lib/utils'
+import { getPlanLogo } from '@/lib/logos'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import FloatingButtons from '@/components/layout/FloatingButtons'
@@ -57,8 +58,12 @@ export default function CartPage() {
                     exit={{ opacity: 0, x: 20, height: 0 }}
                     className="glass rounded-xl p-3 sm:p-4 flex items-center gap-3"
                   >
-                    <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br from-purple-900/60 to-zinc-900 border border-white/10 flex items-center justify-center text-lg font-black text-white shrink-0">
-                      {item.plan.name[0]}
+                    <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br from-purple-900/60 to-zinc-900 border border-white/10 flex items-center justify-center shrink-0 overflow-hidden p-1.5">
+                      {getPlanLogo(item.plan.name, item.plan.image_url) ? (
+                        <img src={getPlanLogo(item.plan.name, item.plan.image_url)!} alt={item.plan.name} className="w-full h-full object-contain"
+                          onError={(e) => { const t = e.target as HTMLImageElement; t.style.display='none'; (t.nextElementSibling as HTMLElement)?.classList.remove('hidden') }} />
+                      ) : null}
+                      <span className={`text-lg font-black text-white ${getPlanLogo(item.plan.name, item.plan.image_url) ? 'hidden' : ''}`}>{item.plan.name[0]}</span>
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-white text-sm truncate">{item.plan.name}</p>

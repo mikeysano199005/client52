@@ -5,6 +5,7 @@ import { Plus, Edit2, Trash2, Check, X, LayoutGrid, Tv, Layers, Gamepad2, Shield
 import toast from 'react-hot-toast'
 import type { Plan, PlanVariant } from '@/types'
 import { formatPrice } from '@/lib/utils'
+import { getPlanLogo } from '@/lib/logos'
 
 const CATEGORIES = [
   { label: 'All', icon: <LayoutGrid className="w-4 h-4" />, color: 'bg-zinc-700' },
@@ -16,27 +17,6 @@ const CATEGORIES = [
   { label: 'Premium', icon: <Star className="w-4 h-4" />, color: 'bg-amber-500' },
   { label: 'Digital Keys', icon: <Key className="w-4 h-4" />, color: 'bg-pink-600' },
 ]
-
-const PLATFORM_LOGOS: [string, string][] = [
-  ['netflix', '/logos/netflix.svg'],
-  ['amazon', '/logos/prime.svg'],
-  ['prime', '/logos/prime.svg'],
-  ['hotstar', '/logos/hotstar.svg'],
-  ['disney', '/logos/hotstar.svg'],
-  ['youtube', '/logos/youtube.svg'],
-  ['zee5', '/logos/zee5.svg'],
-  ['sony', '/logos/sonyliv.svg'],
-  ['spotify', '/logos/spotify.svg'],
-]
-
-function getPlanLogo(plan: Plan): string | null {
-  if (plan.image_url) return plan.image_url
-  const lower = plan.name.toLowerCase()
-  for (const [key, logo] of PLATFORM_LOGOS) {
-    if (lower.includes(key)) return logo
-  }
-  return null
-}
 
 interface InlineEdit {
   planId: string
@@ -193,8 +173,8 @@ export default function AdminProductsPage() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center overflow-hidden p-1 flex-shrink-0">
-                        {getPlanLogo(plan)
-                          ? <img src={getPlanLogo(plan)!} alt={plan.name} className="w-full h-full object-contain" />
+                        {getPlanLogo(plan.name, plan.image_url)
+                          ? <img src={getPlanLogo(plan.name, plan.image_url)!} alt={plan.name} className="w-full h-full object-contain" />
                           : <span className="text-sm font-black text-white">{plan.name[0]}</span>}
                       </div>
                       <div>

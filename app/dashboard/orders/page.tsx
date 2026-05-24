@@ -6,6 +6,7 @@ import { Package, ChevronLeft } from 'lucide-react'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import { formatPrice, formatDateTime, ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '@/lib/utils'
+import { getPlanLogo } from '@/lib/logos'
 import type { Order } from '@/types'
 
 const STEPS = [
@@ -59,10 +60,17 @@ export default async function OrdersPage() {
               return (
                 <div key={order.id} className="glass rounded-xl overflow-hidden">
                   {/* Header */}
-                  <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between flex-wrap gap-3">
-                    <div>
-                      <h3 className="font-semibold text-white">{order.plan_name}</h3>
-                      <p className="text-xs text-zinc-500 mt-0.5">#{order.order_number} • {formatDateTime(order.created_at)}</p>
+                  <div className="px-4 py-4 border-b border-white/10 flex items-center justify-between flex-wrap gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-900/60 to-zinc-900 border border-white/10 flex items-center justify-center shrink-0 overflow-hidden p-1.5">
+                        {getPlanLogo(order.plan_name) ? (
+                          <img src={getPlanLogo(order.plan_name)!} alt={order.plan_name} className="w-full h-full object-contain" />
+                        ) : <span className="text-sm font-black text-white">{order.plan_name[0]}</span>}
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-white">{order.plan_name}</h3>
+                        <p className="text-xs text-zinc-500 mt-0.5">#{order.order_number} • {formatDateTime(order.created_at)}</p>
+                      </div>
                     </div>
                     <div className="text-right">
                       <span className={`text-xs font-medium px-3 py-1.5 rounded-full ${ORDER_STATUS_COLORS[order.status] || 'text-zinc-400 bg-zinc-400/10'}`}>

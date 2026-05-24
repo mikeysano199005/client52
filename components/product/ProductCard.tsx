@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { useCartStore } from '@/store/cartStore'
 import type { Plan } from '@/types'
 import { formatPrice, getDiscount } from '@/lib/utils'
+import { getPlanLogo } from '@/lib/logos'
 import toast from 'react-hot-toast'
 
 interface ProductCardProps {
@@ -33,34 +34,11 @@ const PLATFORM_COLORS: Record<string, string> = {
   OTT: 'from-purple-900/40 to-zinc-900',
 }
 
-const PLATFORM_LOGOS: [string, string][] = [
-  ['netflix', '/logos/netflix.svg'],
-  ['amazon', '/logos/prime.svg'],
-  ['prime', '/logos/prime.svg'],
-  ['hotstar', '/logos/hotstar.svg'],
-  ['disney', '/logos/hotstar.svg'],
-  ['youtube', '/logos/youtube.svg'],
-  ['zee5', '/logos/zee5.svg'],
-  ['sony', '/logos/sonyliv.svg'],
-  ['spotify', '/logos/spotify.svg'],
-  ['jiocinema', '/logos/jiocinema.svg'],
-  ['mx player', '/logos/mx.svg'],
-]
-
 function getPlatformGradient(name: string) {
   for (const key of Object.keys(PLATFORM_COLORS)) {
     if (name.toLowerCase().includes(key.toLowerCase())) return PLATFORM_COLORS[key]
   }
   return 'from-zinc-900 to-zinc-900'
-}
-
-function getPlatformLogo(plan: Plan): string | null {
-  const lower = plan.name.toLowerCase()
-  for (const [key, logo] of PLATFORM_LOGOS) {
-    if (lower.includes(key)) return logo
-  }
-  if (plan.image_url) return plan.image_url
-  return null
 }
 
 export default function ProductCard({ plan, compact = false }: ProductCardProps) {
@@ -95,7 +73,7 @@ export default function ProductCard({ plan, compact = false }: ProductCardProps)
             } flex items-center justify-center overflow-hidden`}
           >
             {(() => {
-              const logo = getPlatformLogo(plan)
+              const logo = getPlanLogo(plan.name, plan.image_url)
               return logo ? (
                 <img
                   src={logo}
@@ -105,7 +83,7 @@ export default function ProductCard({ plan, compact = false }: ProductCardProps)
                 />
               ) : null
             })()}
-            <div className={`w-16 h-16 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-2xl font-black text-white backdrop-blur-sm ${getPlatformLogo(plan) ? 'hidden' : ''}`}>
+            <div className={`w-16 h-16 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-2xl font-black text-white backdrop-blur-sm ${getPlanLogo(plan.name, plan.image_url) ? 'hidden' : ''}`}>
               {plan.name[0]}
             </div>
 

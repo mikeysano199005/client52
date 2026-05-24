@@ -10,6 +10,7 @@ import PromoBanners from '@/components/home/PromoBanners'
 import ReviewsSection from '@/components/home/ReviewsSection'
 import FAQSection from '@/components/home/FAQSection'
 import type { Plan, Review } from '@/types'
+import { getPlanLogo } from '@/lib/logos'
 
 async function getData() {
   const [plansRes, reviewsRes, settingsRes] = await Promise.all([
@@ -71,8 +72,16 @@ export default async function HomePage() {
                   href={`/product/${plan.id}`}
                   className="glass glass-hover rounded-xl overflow-hidden group"
                 >
-                  <div className="h-32 bg-gradient-to-br from-purple-950/60 to-zinc-950 flex items-center justify-center relative">
-                    <div className="w-12 h-12 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-xl font-black text-white">
+                  <div className="h-32 bg-gradient-to-br from-purple-950/60 to-zinc-950 flex items-center justify-center relative overflow-hidden">
+                    {getPlanLogo(plan.name, plan.image_url) ? (
+                      <img
+                        src={getPlanLogo(plan.name, plan.image_url)!}
+                        alt={plan.name}
+                        className="w-3/4 max-h-14 object-contain drop-shadow-lg"
+                        onError={(e) => { const t = e.target as HTMLImageElement; t.style.display='none'; (t.nextElementSibling as HTMLElement)?.classList.remove('hidden') }}
+                      />
+                    ) : null}
+                    <div className={`w-12 h-12 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-xl font-black text-white ${getPlanLogo(plan.name, plan.image_url) ? 'hidden' : ''}`}>
                       {plan.name[0]}
                     </div>
                     {plan.badge && (
