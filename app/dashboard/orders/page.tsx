@@ -144,7 +144,7 @@ export default function OrdersPage() {
         {/* Live indicator */}
         <div className="flex items-center gap-1.5 mb-4">
           <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+            <span className="absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-40" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
           </span>
           <span className="text-[11px] text-zinc-500">Live — updates every 8 seconds</span>
@@ -213,7 +213,7 @@ export default function OrdersPage() {
                                 i < currentIdx
                                   ? 'bg-purple-600 border-purple-600 text-white'
                                   : i === currentIdx
-                                  ? 'border-purple-500 text-purple-400 bg-purple-500/10 animate-pulse-glow'
+                                  ? 'border-purple-500 text-purple-400 bg-purple-500/10'
                                   : 'border-zinc-700 text-zinc-600'
                               }`}>
                                 {i < currentIdx ? '✓' : i + 1}

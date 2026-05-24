@@ -133,7 +133,7 @@ export default function Navbar({ user }: NavbarProps) {
                         <div className="py-1">
                           <DropdownLink href="/dashboard" icon={<LayoutDashboard className="w-4 h-4" />} label="Dashboard" />
                           <DropdownLink href="/dashboard/orders" icon={<ShoppingCart className="w-4 h-4" />} label="My Orders" />
-                          {user.role === 'admin' && (
+                          {(user.role === 'admin' || user.role === 'owner') && (
                             <DropdownLink href="/admin" icon={<Settings className="w-4 h-4" />} label="Admin Panel" />
                           )}
                           <button

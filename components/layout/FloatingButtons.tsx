@@ -74,7 +74,7 @@ export default function FloatingButtons({
       {/* Toggle button */}
       <button
         onClick={() => setOpen(!open)}
-        className="w-14 h-14 bg-gradient-to-br from-purple-600 to-cyan-500 rounded-full flex items-center justify-center shadow-lg animate-pulse-glow text-white transition-all active:opacity-80"
+        className="w-14 h-14 bg-gradient-to-br from-purple-600 to-cyan-500 rounded-full flex items-center justify-center shadow-lg text-white transition-all active:opacity-80"
       >
         {open ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
       </button>

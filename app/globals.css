@@ -112,23 +112,8 @@ body {
 
 /* Activity ticker — scrolled via JS, no CSS animation */
 
-/* Floating animation */
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-}
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-/* Pulse glow */
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 10px rgba(139, 92, 246, 0.3); }
-  50% { box-shadow: 0 0 25px rgba(139, 92, 246, 0.6); }
-}
-.animate-pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
-}
+/* Floating animation — removed (caused mobile repaints) */
+/* Pulse glow — removed (caused mobile repaints on fixed elements) */
 
 /* Hide scrollbar but keep scroll */
 .no-scrollbar::-webkit-scrollbar { display: none; }
