@@ -25,10 +25,15 @@ export default function AdminSupportPage() {
   useEffect(() => { fetchTickets() }, [])
 
   async function fetchTickets() {
-    const res = await fetch('/api/admin/support')
-    const data = await res.json()
-    setTickets(data || [])
-    setLoading(false)
+    try {
+      const res = await fetch('/api/admin/support')
+      const data = await res.json()
+      setTickets(Array.isArray(data) ? data : [])
+    } catch {
+      setTickets([])
+    } finally {
+      setLoading(false)
+    }
   }
 
   async function handleReply(status: 'replied' | 'closed') {

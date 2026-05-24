@@ -4,7 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase'
 import Link from 'next/link'
 import {
   ShoppingBag, Wallet, Users, Copy, ExternalLink,
-  TrendingUp, Clock, CheckCircle, Package, LogOut
+  TrendingUp, Clock, CheckCircle, Package, LogOut, Headphones
 } from 'lucide-react'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
@@ -160,6 +160,21 @@ export default async function DashboardPage() {
                   {formatPrice(referrals.filter((r) => r.status === 'credited').reduce((s: number, r: { reward_amount: number }) => s + r.reward_amount, 0))}
                 </span>
               </div>
+            </div>
+
+            {/* Support */}
+            <div className="glass rounded-xl p-5">
+              <h2 className="font-bold text-white text-sm mb-3 flex items-center gap-2">
+                <Headphones className="w-4 h-4 text-purple-400" />
+                Support
+              </h2>
+              <p className="text-xs text-zinc-500 mb-3">Have an issue with your order? Open a support ticket.</p>
+              <Link
+                href="/dashboard/support"
+                className="block text-center py-2.5 border border-white/20 hover:border-purple-500/50 text-sm text-zinc-300 hover:text-purple-400 rounded-xl transition-all"
+              >
+                View Tickets →
+              </Link>
             </div>
 
             {/* Account Security */}
