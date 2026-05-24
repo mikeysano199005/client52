@@ -152,6 +152,15 @@ body {
   box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
 }
 
+/* Policy pages */
+.policy-body p { margin-bottom: 0.75rem; }
+.policy-body ul,
+.policy-body ol { padding-left: 1.25rem; margin-bottom: 0.5rem; }
+.policy-body ul { list-style: disc; }
+.policy-body ol { list-style: decimal; }
+.policy-body li { margin-bottom: 0.5rem; }
+.policy-body strong { color: #e4e4e7; font-weight: 600; }
+
 /* Stars */
 .stars {
   color: #fbbf24;
