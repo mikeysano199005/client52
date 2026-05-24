@@ -55,9 +55,9 @@ export default function ChatWidget() {
       <AnimatePresence>
         {!open && (
           <motion.button
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            exit={{ scale: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             onClick={() => setOpen(true)}
             className="fixed bottom-24 right-6 z-40 w-12 h-12 bg-gradient-to-br from-purple-600 to-cyan-500 rounded-full flex items-center justify-center shadow-lg text-white"
             title="AI Support"
