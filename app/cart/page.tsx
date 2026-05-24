@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ShoppingCart, Trash2, ArrowRight, Zap, Tag } from 'lucide-react'
+import { ShoppingCart, Trash2, ArrowRight, Zap, Tag, ArrowLeft } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
 import { formatPrice } from '@/lib/utils'
 import { getPlanLogo, getPlanCardBg } from '@/lib/logos'
@@ -24,13 +24,18 @@ export default function CartPage() {
     <div className="min-h-screen">
       <Navbar user={user} />
       <main className="max-w-4xl mx-auto px-4 sm:px-6 pt-24 pb-20">
-        <h1 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-          <ShoppingCart className="w-6 h-6 text-purple-400" />
-          Your Cart
-          {count() > 0 && (
-            <span className="text-sm font-normal text-zinc-500 ml-1">({count()} items)</span>
-          )}
-        </h1>
+        <div className="flex items-center gap-3 mb-6">
+          <Link href="/" className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-400 hover:text-white transition-all">
+            <ArrowLeft className="w-4 h-4" />
+          </Link>
+          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+            <ShoppingCart className="w-6 h-6 text-purple-400" />
+            Your Cart
+            {count() > 0 && (
+              <span className="text-sm font-normal text-zinc-500 ml-1">({count()} items)</span>
+            )}
+          </h1>
+        </div>
 
         {count() === 0 ? (
           <div className="glass rounded-2xl p-8 sm:p-16 text-center">
