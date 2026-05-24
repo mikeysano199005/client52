@@ -61,8 +61,8 @@ export default function Navbar({ user }: NavbarProps) {
                 <Tv className="w-4 h-4 text-white" />
               </div>
               <span className="font-bold text-lg tracking-tight">
-                <span className="gradient-text">Stream</span>
-                <span className="text-white">Zone</span>
+                <span className="gradient-text">DIGITAL</span>
+                <span className="text-white"> OTT</span>
               </span>
             </Link>
 

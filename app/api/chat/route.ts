@@ -2,7 +2,7 @@ import Anthropic from '@anthropic-ai/sdk'
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
-const SYSTEM = `You are a helpful customer support assistant for StreamZone, a premium OTT subscription selling website in India.
+const SYSTEM = `You are a helpful customer support assistant for DIGITAL OTT, a premium OTT subscription selling website in India.
 
 Key info:
 - We sell Netflix, Amazon Prime, Jio Hotstar, YouTube Premium, Zee5, and combo packs

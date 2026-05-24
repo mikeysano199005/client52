@@ -5,10 +5,10 @@ import type { Review } from '@/types'
 
 const MOCK_REVIEWS: Review[] = [
   { id: '1', name: 'Rahul Sharma', rating: 5, body: 'Super fast delivery! Got my Netflix credentials within minutes. Totally genuine and works perfectly. 100% recommended!', verified: true, active: true, created_at: new Date().toISOString() },
-  { id: '2', name: 'Priya Mehta', rating: 5, body: 'Been using StreamZone for 6 months now. Always on time, never any issues. Best price for OTT subscriptions in India!', verified: true, active: true, created_at: new Date().toISOString() },
+  { id: '2', name: 'Priya Mehta', rating: 5, body: 'Been using DIGITAL OTT for 6 months now. Always on time, never any issues. Best price for OTT subscriptions in India!', verified: true, active: true, created_at: new Date().toISOString() },
   { id: '3', name: 'Amit Kumar', rating: 5, body: 'Ordered Netflix + Prime combo. Got both accounts instantly. Great service, will order again!', verified: true, active: true, created_at: new Date().toISOString() },
   { id: '4', name: 'Sneha Joshi', rating: 4, body: 'Good service and cheap prices. WhatsApp support is very responsive. Got Hotstar in under 2 hours.', verified: true, active: true, created_at: new Date().toISOString() },
-  { id: '5', name: 'Vikram Singh', rating: 5, body: 'Trust banaya StreamZone pe. 4K Netflix at just ₹149 — unbelievable! Always buy from here now.', verified: true, active: true, created_at: new Date().toISOString() },
+  { id: '5', name: 'Vikram Singh', rating: 5, body: 'Trust banaya DIGITAL OTT pe. 4K Netflix at just ₹149 — unbelievable! Always buy from here now.', verified: true, active: true, created_at: new Date().toISOString() },
   { id: '6', name: 'Divya Patel', rating: 5, body: 'Excellent platform! Wallet cashback system is awesome. Referral bonus credited immediately. Love it!', verified: true, active: true, created_at: new Date().toISOString() },
 ]
 

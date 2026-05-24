@@ -4,7 +4,7 @@ import { getSession } from '@/lib/auth'
 import { ShieldCheck, RefreshCw, XCircle, MessageCircle } from 'lucide-react'
 
 export const metadata = {
-  title: 'Refund & Replacement Policy — StreamZone',
+  title: 'Refund & Replacement Policy — DIGITAL OTT',
   description: 'Understand our refund and replacement guidelines for digital OTT subscriptions.',
 }
 

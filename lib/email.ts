@@ -31,7 +31,7 @@ export async function sendOrderConfirmation(order: Order, userEmail: string, use
     subject: `Order Confirmed - #${order.order_number}`,
     html: `
       <div style="font-family:sans-serif;max-width:600px;margin:0 auto;background:#09090b;color:#f4f4f5;padding:32px;border-radius:12px">
-        <h1 style="color:#8b5cf6;margin-bottom:8px">StreamZone</h1>
+        <h1 style="color:#8b5cf6;margin-bottom:8px">DIGITAL OTT</h1>
         <h2>Order Received! ✅</h2>
         <p>Hi ${userName}, your order has been received successfully.</p>
         <div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:16px;margin:16px 0">
@@ -58,7 +58,7 @@ export async function sendAccountDelivery(
     subject: `Your Subscription is Ready - #${order.order_number}`,
     html: `
       <div style="font-family:sans-serif;max-width:600px;margin:0 auto;background:#09090b;color:#f4f4f5;padding:32px;border-radius:12px">
-        <h1 style="color:#8b5cf6;margin-bottom:8px">StreamZone</h1>
+        <h1 style="color:#8b5cf6;margin-bottom:8px">DIGITAL OTT</h1>
         <h2>Your Subscription is Ready! 🎉</h2>
         <p>Hi ${userName}, here are your account credentials:</p>
         <div style="background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);border-radius:8px;padding:20px;margin:16px 0">
@@ -80,10 +80,10 @@ export async function sendAccountDelivery(
 export async function sendWelcomeEmail(userEmail: string, userName: string, referralCode: string) {
   await sendEmail({
     to: userEmail,
-    subject: 'Welcome to StreamZone! 🎬',
+    subject: 'Welcome to DIGITAL OTT! 🎬',
     html: `
       <div style="font-family:sans-serif;max-width:600px;margin:0 auto;background:#09090b;color:#f4f4f5;padding:32px;border-radius:12px">
-        <h1 style="color:#8b5cf6;margin-bottom:8px">StreamZone</h1>
+        <h1 style="color:#8b5cf6;margin-bottom:8px">DIGITAL OTT</h1>
         <h2>Welcome, ${userName}! 🎉</h2>
         <p>Your account has been created successfully. You can now browse and buy premium OTT subscriptions at the best prices.</p>
         <div style="background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);border-radius:8px;padding:16px;margin:16px 0">

@@ -135,7 +135,7 @@ export default function AdminSidebar() {
                     <Tv className="w-4 h-4 text-white" />
                   </div>
                   <div>
-                    <p className="font-bold text-sm text-white">StreamZone</p>
+                    <p className="font-bold text-sm text-white">DIGITAL OTT</p>
                     <p className="text-[10px] text-purple-400">Admin Panel</p>
                   </div>
                 </Link>
@@ -160,7 +160,7 @@ export default function AdminSidebar() {
               <Tv className="w-4 h-4 text-white" />
             </div>
             <div>
-              <p className="font-bold text-sm text-white">StreamZone</p>
+              <p className="font-bold text-sm text-white">DIGITAL OTT</p>
               <p className="text-[10px] text-purple-400">Admin Panel</p>
             </div>
           </Link>

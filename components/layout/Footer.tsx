@@ -105,7 +105,7 @@ export default function Footer() {
       <div className="border-t border-white/5 py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
           <p className="text-xs text-zinc-600">
-            © {new Date().getFullYear()} StreamZone. All rights reserved.
+            © {new Date().getFullYear()} DIGITAL OTT. All rights reserved.
           </p>
           <div className="hidden sm:flex items-center gap-4">
             {['OTT', 'Games', 'Combos', 'Utilities', 'VPN'].map((c) => (

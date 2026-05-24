@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import { supabaseAdmin } from '@/lib/supabase'
 import { getSession } from '@/lib/auth'
 import Navbar from '@/components/layout/Navbar'
@@ -10,8 +9,8 @@ import TopSellers from '@/components/home/TopSellers'
 import PromoBanners from '@/components/home/PromoBanners'
 import ReviewsSection from '@/components/home/ReviewsSection'
 import FAQSection from '@/components/home/FAQSection'
+import ProductCard from '@/components/product/ProductCard'
 import type { Plan, Review } from '@/types'
-import { getPlanLogo } from '@/lib/logos'
 
 async function getData() {
   const [plansRes, reviewsRes, settingsRes] = await Promise.all([
@@ -61,57 +60,9 @@ export default async function HomePage() {
             </div>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-            {plans.map((plan) => {
-              const cheapest = plan.price_variants[0]
-              if (!cheapest) return null
-              const discount = Math.round(
-                ((cheapest.original_price - cheapest.price) / cheapest.original_price) * 100
-              )
-              return (
-                <a
-                  key={plan.id}
-                  href={`/product/${plan.id}`}
-                  className="glass glass-hover rounded-xl overflow-hidden group"
-                >
-                  <div className="h-28 bg-[#111113] flex items-center justify-center relative overflow-hidden">
-                    <div className="absolute inset-0 opacity-40" style={{ backgroundImage: 'radial-gradient(rgba(139,92,246,0.15) 1px, transparent 1px)', backgroundSize: '18px 18px' }} />
-                    {getPlanLogo(plan.name, plan.image_url) ? (
-                      <div className="relative z-10 bg-white rounded-xl flex items-center justify-center shadow-md" style={{ width: 64, height: 64, padding: 8 }}>
-                        <Image
-                          src={getPlanLogo(plan.name, plan.image_url)!}
-                          alt={plan.name}
-                          width={48}
-                          height={48}
-                          className="object-contain"
-                          loading="lazy"
-                        />
-                      </div>
-                    ) : (
-                      <div className="relative z-10 w-12 h-12 rounded-xl bg-gradient-to-br from-purple-600/40 to-cyan-600/20 border border-white/10 flex items-center justify-center text-xl font-black text-white">
-                        {plan.name[0]}
-                      </div>
-                    )}
-                    {plan.badge && (
-                      <span className="absolute top-2 left-2 text-[9px] font-bold text-white bg-purple-600 px-1.5 py-0.5 rounded-full">
-                        {plan.badge}
-                      </span>
-                    )}
-                    {discount > 0 && (
-                      <span className="absolute top-2 right-2 text-[9px] font-bold text-white bg-green-600 px-1.5 py-0.5 rounded-full">
-                        -{discount}%
-                      </span>
-                    )}
-                  </div>
-                  <div className="p-2.5">
-                    <p className="text-xs font-semibold text-white truncate group-hover:text-purple-400 transition-colors">
-                      {plan.name}
-                    </p>
-                    <p className="text-sm font-bold text-white mt-1">₹{cheapest.price}</p>
-                    <p className="text-[10px] text-zinc-500 line-through">₹{cheapest.original_price}</p>
-                  </div>
-                </a>
-              )
-            })}
+            {plans.map((plan) => (
+              <ProductCard key={plan.id} plan={plan} compact />
+            ))}
           </div>
         </section>
 

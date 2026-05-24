@@ -18,7 +18,7 @@ const QUICK_QUESTIONS = [
 export default function ChatWidget() {
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: 'Hi! 👋 I\'m your StreamZone support assistant. How can I help you today?' }
+    { role: 'assistant', content: 'Hi! 👋 I\'m your DIGITAL OTT support assistant. How can I help you today?' }
   ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -83,7 +83,7 @@ export default function ChatWidget() {
                   <Bot className="w-3.5 h-3.5 text-white" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-white">StreamZone Support</p>
+                  <p className="text-sm font-semibold text-white">DIGITAL OTT Support</p>
                   <p className="text-[10px] text-green-400">● Online</p>
                 </div>
               </div>

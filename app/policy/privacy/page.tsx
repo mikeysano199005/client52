@@ -4,8 +4,8 @@ import { getSession } from '@/lib/auth'
 import { Lock, Database, Share2, UserCheck, Mail } from 'lucide-react'
 
 export const metadata = {
-  title: 'Privacy Policy — StreamZone',
-  description: 'Learn how StreamZone collects, uses, and protects your personal data.',
+  title: 'Privacy Policy — DIGITAL OTT',
+  description: 'Learn how DIGITAL OTT collects, uses, and protects your personal data.',
 }
 
 export default async function PrivacyPolicyPage() {

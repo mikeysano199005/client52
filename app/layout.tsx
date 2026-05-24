@@ -14,11 +14,11 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: 'StreamZone - Premium OTT Subscriptions',
+  title: 'DIGITAL OTT - Premium OTT Subscriptions',
   description: 'Buy Netflix, Amazon Prime, Hotstar & more at the best prices. Instant delivery, 100% genuine.',
   keywords: 'Netflix subscription, Amazon Prime, Hotstar, OTT plans, buy OTT subscription India',
   openGraph: {
-    title: 'StreamZone - Premium OTT Subscriptions',
+    title: 'DIGITAL OTT - Premium OTT Subscriptions',
     description: 'Best prices on Netflix, Prime, Hotstar & more. Instant delivery guaranteed.',
     type: 'website',
   },

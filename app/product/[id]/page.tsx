@@ -338,7 +338,7 @@ export default function ProductPage() {
                   <p className="text-sm text-zinc-400 leading-relaxed">{r.body}</p>
                   {r.admin_reply && (
                     <div className="mt-3 pl-3 border-l-2 border-purple-500/40">
-                      <p className="text-xs text-purple-400 font-semibold mb-0.5">StreamZone</p>
+                      <p className="text-xs text-purple-400 font-semibold mb-0.5">DIGITAL OTT</p>
                       <p className="text-xs text-zinc-500">{r.admin_reply}</p>
                     </div>
                   )}

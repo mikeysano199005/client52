@@ -4,8 +4,8 @@ import { getSession } from '@/lib/auth'
 import { FileText, ShieldAlert, CreditCard, AlertTriangle, Settings, HeadphonesIcon } from 'lucide-react'
 
 export const metadata = {
-  title: 'Terms of Service — StreamZone',
-  description: 'Read the Terms of Service governing use of StreamZone and our digital products.',
+  title: 'Terms of Service — DIGITAL OTT',
+  description: 'Read the Terms of Service governing use of DIGITAL OTT and our digital products.',
 }
 
 export default async function TermsPage() {
