@@ -216,7 +216,7 @@ export default function AdminOrdersPage() {
             className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
             onClick={closeModal}
           >
-            <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               onClick={e => e.stopPropagation()}
               className="bg-[#111113] border border-white/10 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
             >
@@ -327,7 +327,7 @@ export default function AdminOrdersPage() {
                     ) : (
                       <>
                         <p className="text-xs text-zinc-500">{availableStock.length} account{availableStock.length !== 1 ? 's' : ''} available — pick one to send to customer:</p>
-                        <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+                        <div className="space-y-2">
                           {availableStock.map(acc => (
                             <button key={acc.id} onClick={() => setPickedAccount(acc)}
                               className={`w-full text-left px-4 py-3 rounded-xl border transition-all ${
