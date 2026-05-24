@@ -155,6 +155,19 @@ export interface SiteSettings {
   currency_symbol: string
 }
 
+export interface WalletTopup {
+  id: string
+  user_id: string
+  amount: number
+  status: 'pending' | 'approved' | 'rejected'
+  payment_proof_url?: string
+  payment_utr?: string
+  admin_notes?: string
+  created_at: string
+  updated_at: string
+  user?: User
+}
+
 export interface AdminAnalytics {
   total_orders: number
   total_revenue: number
