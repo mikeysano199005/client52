@@ -4,6 +4,7 @@ import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import FloatingButtons from '@/components/layout/FloatingButtons'
 import HeroBanner from '@/components/home/HeroBanner'
+import ActivityTicker from '@/components/home/ActivityTicker'
 import CategoryRow from '@/components/home/CategoryRow'
 import TopSellers from '@/components/home/TopSellers'
 import PromoBanners from '@/components/home/PromoBanners'
@@ -44,6 +45,9 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen">
       <Navbar user={user ? { name: user.name, role: user.role, wallet_balance: user.wallet_balance } : null} />
+      <div className="pt-14 lg:pt-16">
+        <ActivityTicker />
+      </div>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 pb-16 sm:pb-20">
         <HeroBanner plans={featured} banners={[]} discountedPlans={discounted} />

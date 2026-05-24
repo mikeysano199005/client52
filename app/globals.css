@@ -110,6 +110,13 @@ body {
   border-radius: 6px;
 }
 
+/* Activity ticker scroll */
+@keyframes ticker-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.ticker-track { will-change: transform; }
+
 /* Floating animation */
 @keyframes float {
   0%, 100% { transform: translateY(0); }
