@@ -5,6 +5,7 @@ import Footer from '@/components/layout/Footer'
 import FloatingButtons from '@/components/layout/FloatingButtons'
 import HeroBanner from '@/components/home/HeroBanner'
 import ActivityTicker from '@/components/home/ActivityTicker'
+import RecommendedCombo from '@/components/home/RecommendedCombo'
 import CategoryRow from '@/components/home/CategoryRow'
 import TopSellers from '@/components/home/TopSellers'
 import PromoBanners from '@/components/home/PromoBanners'
@@ -54,6 +55,8 @@ export default async function HomePage() {
         <CategoryRow />
         <TopSellers plans={plans} />
         <PromoBanners />
+
+        <RecommendedCombo plans={plans} />
 
         {/* All Plans Grid */}
         <section className="mt-12">
