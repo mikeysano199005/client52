@@ -219,11 +219,14 @@ html.light .card-img { background-color: #1c1c1f !important; }
 /* Inline style provides the brand gradient; !important here wins in light mode */
 html.light .card-img-area { background: #ffffff !important; }
 
-/* ── Hero banner text zone — always on dark gradient, keep text light ── */
-html.light .hero-text-zone [class~="text-white"] { color: #ffffff !important; }
-html.light .hero-text-zone [class~="text-zinc-400"] { color: #a1a1aa !important; }
-html.light .hero-text-zone [class~="text-zinc-500"] { color: #808088 !important; }
+/* ── Hero banner — always dark bg + white text, immune to light mode ── */
+/* Background forced via inline style in HeroBanner.tsx (no class override needed) */
+html.light .hero-text-zone * { color: inherit; }
+html.light .hero-text-zone [class~="text-white"]     { color: #ffffff !important; }
+html.light .hero-text-zone [class~="text-zinc-400"]  { color: #c4c4cc !important; }
+html.light .hero-text-zone [class~="text-zinc-500"]  { color: #a0a0a8 !important; }
 html.light .hero-text-zone [class~="text-amber-400"] { color: #fbbf24 !important; }
+html.light .hero-text-zone [class~="text-red-400"]   { color: #f87171 !important; }
 
 /* ── Glass cards ── */
 html.light .glass {

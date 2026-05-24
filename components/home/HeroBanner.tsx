@@ -13,22 +13,26 @@ interface HeroBannerProps {
   discountedPlans: Plan[]
 }
 
-const PLATFORM_GRADIENTS: Record<string, string> = {
-  Netflix: 'from-red-950 via-red-900/50 to-zinc-950',
-  Amazon: 'from-blue-950 via-blue-900/50 to-zinc-950',
-  Prime: 'from-blue-950 via-blue-900/50 to-zinc-950',
-  Hotstar: 'from-blue-950 via-indigo-900/50 to-zinc-950',
-  Jio: 'from-indigo-950 via-indigo-900/50 to-zinc-950',
-  YouTube: 'from-red-950 via-red-900/40 to-zinc-950',
-  Zee5: 'from-purple-950 via-purple-900/50 to-zinc-950',
-  Combo: 'from-purple-950 via-cyan-900/30 to-zinc-950',
+// Using raw CSS gradients (not Tailwind classes) so light-mode class overrides can't touch them
+const PLATFORM_GRADIENTS_CSS: Record<string, string> = {
+  netflix:    'linear-gradient(135deg, #3b0000 0%, rgba(127,29,29,0.65) 45%, #09090b 100%)',
+  amazon:     'linear-gradient(135deg, #000e28 0%, rgba(30,58,138,0.65) 45%, #09090b 100%)',
+  prime:      'linear-gradient(135deg, #000e28 0%, rgba(30,58,138,0.65) 45%, #09090b 100%)',
+  hotstar:    'linear-gradient(135deg, #00001f 0%, rgba(49,46,129,0.60) 45%, #09090b 100%)',
+  disney:     'linear-gradient(135deg, #00001f 0%, rgba(49,46,129,0.60) 45%, #09090b 100%)',
+  jio:        'linear-gradient(135deg, #00001a 0%, rgba(67,56,202,0.55) 45%, #09090b 100%)',
+  youtube:    'linear-gradient(135deg, #200000 0%, rgba(153,27,27,0.55) 45%, #09090b 100%)',
+  zee5:       'linear-gradient(135deg, #1e0040 0%, rgba(88,28,135,0.60) 45%, #09090b 100%)',
+  sony:       'linear-gradient(135deg, #00102a 0%, rgba(29,78,216,0.50) 45%, #09090b 100%)',
+  spotify:    'linear-gradient(135deg, #001a06 0%, rgba(21,128,61,0.55) 45%, #09090b 100%)',
 }
 
-function getPlatformGrad(name: string) {
-  for (const key of Object.keys(PLATFORM_GRADIENTS)) {
-    if (name.toLowerCase().includes(key.toLowerCase())) return PLATFORM_GRADIENTS[key]
+function getPlatformGradCSS(name: string): string {
+  const lower = name.toLowerCase()
+  for (const [key, grad] of Object.entries(PLATFORM_GRADIENTS_CSS)) {
+    if (lower.includes(key)) return grad
   }
-  return 'from-purple-950 via-zinc-900 to-zinc-950'
+  return 'linear-gradient(135deg, #1a0040 0%, rgba(76,29,149,0.55) 45%, #09090b 100%)'
 }
 
 export default function HeroBanner({ plans, discountedPlans }: HeroBannerProps) {
@@ -51,8 +55,9 @@ export default function HeroBanner({ plans, discountedPlans }: HeroBannerProps) 
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4 pt-16 sm:pt-20">
-      {/* Main slider */}
-      <div className="relative rounded-2xl overflow-hidden h-[240px] sm:h-[320px] lg:h-[400px]">
+      {/* Main slider — base bg is always near-black so light mode can't wash it out */}
+      <div className="relative rounded-2xl overflow-hidden h-[240px] sm:h-[320px] lg:h-[400px]" style={{ background: '#09090b' }}>
+        {/* Brand gradient — inline style, immune to CSS class overrides in any theme */}
         <AnimatePresence mode="wait">
           <motion.div
             key={plan.id}
@@ -60,12 +65,13 @@ export default function HeroBanner({ plans, discountedPlans }: HeroBannerProps) 
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -40 }}
             transition={{ duration: 0.4 }}
-            className={`absolute inset-0 bg-gradient-to-br ${getPlatformGrad(plan.name)}`}
+            className="absolute inset-0"
+            style={{ background: getPlatformGradCSS(plan.name) }}
           />
         </AnimatePresence>
 
         {/* Noise texture overlay */}
-        <div className="absolute inset-0 opacity-30" style={{
+        <div className="absolute inset-0 opacity-20" style={{
           backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\' opacity=\'0.4\'/%3E%3C/svg%3E")',
         }} />
 
@@ -77,6 +83,9 @@ export default function HeroBanner({ plans, discountedPlans }: HeroBannerProps) 
           }}
         />
 
+        {/* Text protection: dark vignette from bottom so text always pops */}
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.80) 0%, rgba(0,0,0,0.25) 50%, transparent 80%)' }} />
+
         {/* Content */}
         <div className="hero-text-zone relative z-10 h-full flex flex-col justify-end p-4 sm:p-6 lg:p-8">
           <AnimatePresence mode="wait">
@@ -87,17 +96,21 @@ export default function HeroBanner({ plans, discountedPlans }: HeroBannerProps) 
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.35 }}
             >
-              {/* Platform logo */}
+              {/* Platform logo + name */}
+              {(() => {
+                const heroLogo = getPlanLogo(plan.name, plan.image_url)
+                const heroIsBuiltin = heroLogo?.startsWith('/logos/')
+                return (
               <div className="flex items-center gap-3 mb-3">
-                {getPlanLogo(plan.name, plan.image_url) ? (
-                  <img src={getPlanLogo(plan.name, plan.image_url)!} alt={plan.name} className="h-10 max-w-[180px] object-contain drop-shadow-lg" />
-                ) : (
-                  <div className="w-10 h-10 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center text-xl font-black text-white">
-                    {plan.name[0]}
-                  </div>
-                )}
+                {heroLogo ? (
+                  heroIsBuiltin
+                    ? <img src={heroLogo} alt={plan.name} className="h-10 max-w-[180px] object-contain drop-shadow-lg" />
+                    : <img src={heroLogo} alt={plan.name} className="h-10 w-10 object-cover rounded-lg drop-shadow-lg" />
+                ) : null}
                 <div>
-                  <h2 className="text-lg sm:text-2xl lg:text-3xl font-black text-white tracking-tight">{getPlanLogo(plan.name, plan.image_url) ? '' : plan.name}</h2>
+                  <h2 className="text-lg sm:text-2xl lg:text-3xl font-black text-white tracking-tight drop-shadow-lg">
+                    {!heroIsBuiltin ? plan.name : ''}
+                  </h2>
                   <div className="flex items-center gap-2 text-xs text-zinc-400">
                     <span>{cheapest?.quality}</span>
                     <span>•</span>
@@ -108,9 +121,11 @@ export default function HeroBanner({ plans, discountedPlans }: HeroBannerProps) 
                   </div>
                 </div>
               </div>
+                )
+              })()}
 
               {plan.description && (
-                <p className="hidden sm:block text-sm text-zinc-400 mb-4 max-w-lg line-clamp-2">{plan.description}</p>
+                <p className="hidden sm:block text-sm text-zinc-400 mb-4 max-w-lg line-clamp-2 drop-shadow">{plan.description}</p>
               )}
 
               <div className="flex items-center gap-4 flex-wrap">
