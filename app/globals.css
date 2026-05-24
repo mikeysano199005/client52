@@ -164,6 +164,11 @@ body {
   letter-spacing: 1px;
 }
 
+/* Product card image area — always stays dark so logos are visible in any theme */
+.card-img {
+  background-color: #111113;
+}
+
 /* ─── Light Mode ─────────────────────────────────────────────────── */
 html.light body {
   background: #f4f4f5;
@@ -206,6 +211,9 @@ html.light [class*="bg-[#18181b]"] { background-color: #e4e4e7; }
 
 /* ── Borders: dark borders replace transparent-white ones ── */
 html.light [class*="border-white/"] { border-color: rgba(0, 0, 0, 0.09); }
+
+/* ── Card image area stays dark even in light mode ── */
+html.light .card-img { background-color: #1c1c1f !important; }
 
 /* ── Glass cards ── */
 html.light .glass {

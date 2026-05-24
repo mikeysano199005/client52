@@ -141,7 +141,7 @@ export default function ProductPage() {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="rounded-2xl overflow-hidden h-52 sm:h-72 bg-gradient-to-br from-purple-950 via-zinc-900 to-zinc-950 relative"
+              className="card-img rounded-2xl overflow-hidden h-52 sm:h-72 relative"
             >
               {getPlanLogo(plan.name, plan.image_url) ? (
                 <img
@@ -461,7 +461,7 @@ export default function ProductPage() {
                 if (!v) return null
                 return (
                   <Link key={p.id} href={`/product/${p.id}`} className="glass glass-hover rounded-xl overflow-hidden group">
-                    <div className="h-28 bg-[#111113] overflow-hidden relative">
+                    <div className="card-img h-28 overflow-hidden relative">
                       {getPlanLogo(p.name, p.image_url) ? (
                         <img src={getPlanLogo(p.name, p.image_url)!} alt={p.name} className="absolute inset-0 w-full h-full object-contain p-4"
                           onError={(e) => { const t = e.target as HTMLImageElement; t.style.display='none'; (t.nextElementSibling as HTMLElement)?.classList.remove('hidden') }} />

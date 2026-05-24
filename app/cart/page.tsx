@@ -58,7 +58,7 @@ export default function CartPage() {
                     exit={{ opacity: 0, x: 20, height: 0 }}
                     className="glass rounded-xl p-3 sm:p-4 flex items-center gap-3"
                   >
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-[#111113] border border-white/10 shrink-0 overflow-hidden relative">
+                    <div className="card-img w-12 h-12 sm:w-14 sm:h-14 rounded-xl border border-white/10 shrink-0 overflow-hidden relative">
                       {getPlanLogo(item.plan.name, item.plan.image_url) ? (
                         <img src={getPlanLogo(item.plan.name, item.plan.image_url)!} alt={item.plan.name} className="absolute inset-0 w-full h-full object-contain p-1.5"
                           onError={(e) => { const t = e.target as HTMLImageElement; t.style.display='none'; (t.nextElementSibling as HTMLElement)?.classList.remove('hidden') }} />
