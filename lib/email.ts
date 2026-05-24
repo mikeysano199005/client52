@@ -20,7 +20,7 @@ export async function sendEmail(payload: EmailPayload) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: process.env.EMAIL_FROM || 'noreply@digitalott.in',
+      from: process.env.EMAIL_FROM || 'onboarding@resend.dev',
       to: payload.to,
       subject: payload.subject,
       html: payload.html,
