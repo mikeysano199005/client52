@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from 'next'
 import { Geist } from 'next/font/google'
 import './globals.css'
-import { Toaster } from 'react-hot-toast'
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
+import ThemedToaster from '@/components/ui/ThemedToaster'
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist-sans' })
 
@@ -34,19 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen antialiased">
         <ThemeProvider>
           {children}
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              style: {
-                background: '#18181b',
-                color: '#f4f4f5',
-                border: '1px solid rgba(139,92,246,0.3)',
-                borderRadius: '10px',
-              },
-              success: { iconTheme: { primary: '#22c55e', secondary: '#18181b' } },
-              error: { iconTheme: { primary: '#ef4444', secondary: '#18181b' } },
-            }}
-          />
+          <ThemedToaster />
         </ThemeProvider>
       </body>
     </html>

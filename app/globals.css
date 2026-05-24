@@ -164,40 +164,74 @@ html.light body {
   color: #18181b;
 }
 
+/* ── Text: make white/light text readable on light bg ── */
+html.light [class~="text-white"] { color: #18181b; }
+html.light [class~="text-zinc-50"],
+html.light [class~="text-zinc-100"] { color: #27272a; }
+html.light [class~="text-zinc-200"],
+html.light [class~="text-zinc-300"] { color: #3f3f46; }
+html.light [class~="text-zinc-400"] { color: #52525b; }
+html.light [class~="text-zinc-500"] { color: #71717a; }
+html.light [class~="text-zinc-600"] { color: #a1a1aa; }
+
+/* Restore white text on colored backgrounds (buttons, badges, avatars) */
+html.light [class~="text-white"][class*="bg-purple"],
+html.light [class~="text-white"][class*="bg-green"],
+html.light [class~="text-white"][class*="bg-red"],
+html.light [class~="text-white"][class*="bg-cyan"],
+html.light [class~="text-white"][class*="bg-amber"],
+html.light [class~="text-white"][class*="bg-orange"],
+html.light [class~="text-white"][class*="bg-gradient"],
+html.light [class~="text-white"][class*="badge"],
+html.light [class*="bg-purple"] [class~="text-white"],
+html.light [class*="bg-gradient"] [class~="text-white"],
+html.light [class*="badge-"] { color: #ffffff; }
+
+/* ── Backgrounds: lighten dark surfaces ── */
+html.light [class~="bg-zinc-950"] { background-color: #f8f8f9; }
+html.light [class~="bg-zinc-900"] { background-color: #f0f0f2; }
+html.light [class~="bg-zinc-800"] { background-color: #e4e4e7; }
+html.light [class~="bg-zinc-700"] { background-color: #d4d4d8; }
+
+/* Arbitrary dark colors used in JSX */
+html.light [class*="bg-[#09090b]"] { background-color: #f4f4f5; }
+html.light [class*="bg-[#111113]"] { background-color: #e8e8ea; }
+html.light [class*="bg-[#18181b]"] { background-color: #e4e4e7; }
+
+/* ── Borders: dark borders replace transparent-white ones ── */
+html.light [class*="border-white/"] { border-color: rgba(0, 0, 0, 0.09); }
+
+/* ── Glass cards ── */
 html.light .glass {
-  background: rgba(0, 0, 0, 0.04);
+  background: #ffffff;
   border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
-
 html.light .glass-hover:hover {
-  background: rgba(0, 0, 0, 0.06);
+  background: #fafafa;
   border-color: rgba(139, 92, 246, 0.4);
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.1);
 }
 
+/* ── Inputs ── */
 html.light .input-dark {
-  background: rgba(0, 0, 0, 0.05);
+  background: #ffffff;
   border: 1px solid rgba(0, 0, 0, 0.12);
   color: #18181b;
 }
-html.light .input-dark::placeholder {
-  color: #a1a1aa;
-}
+html.light .input-dark::placeholder { color: #a1a1aa; }
 html.light .input-dark:focus {
   border-color: #8b5cf6;
-  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.15);
 }
 
+/* ── Skeleton ── */
 html.light .skeleton {
   background: linear-gradient(90deg, #d4d4d8 25%, #e4e4e7 50%, #d4d4d8 75%);
   background-size: 200% 100%;
 }
 
-html.light ::-webkit-scrollbar-track {
-  background: #e4e4e7;
-}
-html.light ::-webkit-scrollbar-thumb {
-  background: #a1a1aa;
-}
-html.light ::-webkit-scrollbar-thumb:hover {
-  background: #8b5cf6;
-}
+/* ── Scrollbar ── */
+html.light ::-webkit-scrollbar-track { background: #e4e4e7; }
+html.light ::-webkit-scrollbar-thumb { background: #a1a1aa; }
+html.light ::-webkit-scrollbar-thumb:hover { background: #8b5cf6; }
