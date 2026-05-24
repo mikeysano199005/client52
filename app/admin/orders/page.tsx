@@ -19,17 +19,22 @@ interface StockAccount {
   variant_label?: string
 }
 
+type OrderWithAccount = Order & {
+  account_stock?: { email: string; password: string; profile_number?: string; extra_info?: string } | null
+}
+
 export default function AdminOrdersPage() {
-  const [orders, setOrders] = useState<Order[]>([])
+  const [orders, setOrders] = useState<OrderWithAccount[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
-  const [selected, setSelected] = useState<Order | null>(null)
+  const [selected, setSelected] = useState<OrderWithAccount | null>(null)
   const [adminNotes, setAdminNotes] = useState('')
   const [updating, setUpdating] = useState(false)
 
   // Delivery sub-step
   const [deliverStep, setDeliverStep] = useState(false)
+  const [redeliverMode, setRedeliverMode] = useState(false)
   const [availableStock, setAvailableStock] = useState<StockAccount[]>([])
   const [stockLoading, setStockLoading] = useState(false)
   const [pickedAccount, setPickedAccount] = useState<StockAccount | null>(null)
@@ -44,10 +49,11 @@ export default function AdminOrdersPage() {
     setLoading(false)
   }
 
-  function openModal(order: Order) {
+  function openModal(order: OrderWithAccount) {
     setSelected(order)
     setAdminNotes(order.admin_notes || '')
     setDeliverStep(false)
+    setRedeliverMode(false)
     setPickedAccount(null)
     setAvailableStock([])
   }
@@ -55,6 +61,7 @@ export default function AdminOrdersPage() {
   function closeModal() {
     setSelected(null)
     setDeliverStep(false)
+    setRedeliverMode(false)
     setPickedAccount(null)
   }
 
@@ -65,9 +72,10 @@ export default function AdminOrdersPage() {
     setStockLoading(false)
   }, [])
 
-  function startDeliver() {
+  function startDeliver(redeliver = false) {
     if (!selected) return
     setDeliverStep(true)
+    setRedeliverMode(redeliver)
     loadStock(selected.plan_id)
   }
 
@@ -85,10 +93,11 @@ export default function AdminOrdersPage() {
         status: 'delivered',
         admin_notes: adminNotes,
         account_id: pickedAccount?.id || null,
+        force_reassign: redeliverMode,
       }),
     })
     if (res.ok) {
-      toast.success('Order delivered! Credentials sent to customer.')
+      toast.success(redeliverMode ? 'Credentials reassigned & resent!' : 'Order delivered! Credentials sent to customer.')
       await loadOrders()
       closeModal()
     } else {
@@ -172,7 +181,7 @@ export default function AdminOrdersPage() {
               ) : filtered.length === 0 ? (
                 <tr><td colSpan={6} className="px-4 py-12 text-center text-zinc-500">No orders found</td></tr>
               ) : (
-                filtered.map((order) => (
+                filtered.map((order: OrderWithAccount) => (
                   <tr key={order.id} className="hover:bg-white/5 transition-colors">
                     <td className="px-4 py-3 text-xs font-mono text-zinc-400">#{order.order_number}</td>
                     <td className="px-4 py-3">
@@ -252,12 +261,54 @@ export default function AdminOrdersPage() {
                     rows={2} className="input-dark resize-none" placeholder="Internal notes..." />
                 </div>
 
+                {/* ── Delivered: show credentials ── */}
+                {selected.status === 'delivered' && !deliverStep && (
+                  <div className="space-y-3">
+                    {selected.account_stock ? (
+                      <div className="bg-green-500/8 border border-green-500/20 rounded-xl p-4 space-y-2">
+                        <p className="text-xs font-semibold text-green-400 uppercase tracking-wider mb-2">Delivered Credentials</p>
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          <div>
+                            <p className="text-zinc-500">Email</p>
+                            <p className="text-white font-mono">{selected.account_stock.email}</p>
+                          </div>
+                          <div>
+                            <p className="text-zinc-500">Password</p>
+                            <p className="text-white font-mono">
+                              {showPw['modal_cred'] ? selected.account_stock.password : '••••••••'}
+                              <button onClick={() => setShowPw(p => ({ ...p, modal_cred: !p['modal_cred'] }))}
+                                className="ml-1 text-zinc-600 hover:text-zinc-400 align-middle">
+                                {showPw['modal_cred'] ? <EyeOff className="w-3 h-3 inline" /> : <Eye className="w-3 h-3 inline" />}
+                              </button>
+                            </p>
+                          </div>
+                          {selected.account_stock.profile_number && (
+                            <div><p className="text-zinc-500">Profile</p><p className="text-white font-mono">{selected.account_stock.profile_number}</p></div>
+                          )}
+                          {selected.account_stock.extra_info && (
+                            <div className="col-span-2"><p className="text-zinc-500">Extra Info</p><p className="text-white">{selected.account_stock.extra_info}</p></div>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 text-xs text-amber-400">
+                        ⚠️ No credentials assigned to this order
+                      </div>
+                    )}
+                    <button onClick={() => startDeliver(true)}
+                      className="w-full py-2 border border-purple-500/30 text-purple-400 hover:bg-purple-600/20 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-1.5">
+                      <Package className="w-3.5 h-3.5" />
+                      Reassign Credentials &amp; Resend Email
+                    </button>
+                  </div>
+                )}
+
                 {/* ── Delivery step ── */}
                 {deliverStep ? (
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 text-green-400 text-sm font-semibold">
                       <Package className="w-4 h-4" />
-                      Select Account to Deliver
+                      {redeliverMode ? 'Reassign & Resend Credentials' : 'Select Account to Deliver'}
                     </div>
 
                     {stockLoading ? (
@@ -331,8 +382,8 @@ export default function AdminOrdersPage() {
                       </>
                     )}
                   </div>
-                ) : (
-                  /* ── Normal status buttons ── */
+                ) : selected.status !== 'delivered' && (
+                  /* ── Normal status buttons (hidden once delivered) ── */
                   <div>
                     <p className="text-zinc-500 text-xs mb-2">Update Status</p>
                     <div className="grid grid-cols-2 gap-2">
@@ -345,8 +396,8 @@ export default function AdminOrdersPage() {
                       ))}
                       {/* Delivered — triggers account picker */}
                       <button
-                        disabled={updating || selected.status === 'delivered'}
-                        onClick={startDeliver}
+                        disabled={updating}
+                        onClick={() => startDeliver(false)}
                         className="py-2 px-3 rounded-xl text-xs font-semibold bg-green-600 hover:bg-green-500 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
                       >
                         <Package className="w-3.5 h-3.5" />

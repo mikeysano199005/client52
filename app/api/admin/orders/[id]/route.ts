@@ -10,7 +10,7 @@ export async function PATCH(
   try {
     await requireAdmin()
     const { id } = await params
-    const { status, admin_notes, account_id: explicitAccountId } = await req.json()
+    const { status, admin_notes, account_id: explicitAccountId, force_reassign } = await req.json()
 
     // Get the current order
     const { data: order } = await supabaseAdmin
@@ -23,7 +23,7 @@ export async function PATCH(
 
     // If delivering, use explicit account_id (admin picked) or auto-assign
     let accountId = order.account_id
-    if (status === 'delivered' && !accountId) {
+    if (status === 'delivered' && (!accountId || force_reassign)) {
       const stockQuery = explicitAccountId
         ? supabaseAdmin
             .from('account_stock')
