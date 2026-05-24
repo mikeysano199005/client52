@@ -27,6 +27,7 @@ export async function POST(req: Request) {
         active: body.active ?? true,
         sort_order: body.sort_order ?? 0,
         price_variants: body.price_variants,
+        image_url: body.image_url || null,
       })
       .select()
       .single()

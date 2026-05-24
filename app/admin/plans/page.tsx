@@ -1,7 +1,7 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Edit2, Trash2, X, Star } from 'lucide-react'
+import { Plus, Edit2, Trash2, X, Star, Upload, ImageIcon } from 'lucide-react'
 import type { Plan, PlanVariant } from '@/types'
 import { formatPrice } from '@/lib/utils'
 import toast from 'react-hot-toast'
@@ -10,7 +10,7 @@ const CATEGORIES = ['OTT', 'Combos', 'Games', 'VPN', 'Utilities', 'Premium', 'Di
 const BADGES = ['', 'HOT', 'NEW', 'BEST VALUE', 'BEST DEAL']
 
 const EMPTY_VARIANT: PlanVariant = { label: '1 Month', months: 1, price: 0, original_price: 0, quality: '1080p HD', access: '1 Screen' }
-const EMPTY_PLAN = { name: '', category: 'OTT', description: '', badge: '', featured: false, active: true, sort_order: 0, price_variants: [{ ...EMPTY_VARIANT }] }
+const EMPTY_PLAN = { name: '', category: 'OTT', description: '', badge: '', featured: false, active: true, sort_order: 0, image_url: '', price_variants: [{ ...EMPTY_VARIANT }] }
 
 export default function AdminPlansPage() {
   const [plans, setPlans] = useState<Plan[]>([])
@@ -20,7 +20,18 @@ export default function AdminPlansPage() {
   const [form, setForm] = useState(EMPTY_PLAN)
   const [saving, setSaving] = useState(false)
 
+  // Image upload state
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [dragOver, setDragOver] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
   useEffect(() => { loadPlans() }, [])
+
+  // Clean up object URL on unmount or when preview changes
+  useEffect(() => {
+    return () => { if (imagePreview && imagePreview.startsWith('blob:')) URL.revokeObjectURL(imagePreview) }
+  }, [imagePreview])
 
   async function loadPlans() {
     setLoading(true)
@@ -29,9 +40,16 @@ export default function AdminPlansPage() {
     setLoading(false)
   }
 
+  function resetImageState() {
+    if (imagePreview && imagePreview.startsWith('blob:')) URL.revokeObjectURL(imagePreview)
+    setImageFile(null)
+    setImagePreview(null)
+  }
+
   function openCreate() {
     setEditing(null)
     setForm({ ...EMPTY_PLAN, price_variants: [{ ...EMPTY_VARIANT }] })
+    resetImageState()
     setShowForm(true)
   }
 
@@ -40,10 +58,38 @@ export default function AdminPlansPage() {
     setForm({
       name: plan.name, category: plan.category, description: plan.description || '',
       badge: plan.badge || '', featured: plan.featured, active: plan.active,
-      sort_order: plan.sort_order, price_variants: plan.price_variants,
+      sort_order: plan.sort_order, image_url: plan.image_url || '',
+      price_variants: plan.price_variants,
     })
+    resetImageState()
     setShowForm(true)
   }
+
+  function closeForm() {
+    setShowForm(false)
+    resetImageState()
+  }
+
+  function handleFileSelect(file: File) {
+    if (!['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) {
+      toast.error('Only JPG and PNG files are allowed')
+      return
+    }
+    if (file.size > 3 * 1024 * 1024) {
+      toast.error('File too large — max 3 MB')
+      return
+    }
+    if (imagePreview && imagePreview.startsWith('blob:')) URL.revokeObjectURL(imagePreview)
+    setImageFile(file)
+    setImagePreview(URL.createObjectURL(file))
+  }
+
+  const onDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setDragOver(false)
+    const file = e.dataTransfer.files[0]
+    if (file) handleFileSelect(file)
+  }, [])
 
   function addVariant() {
     setForm((f) => ({ ...f, price_variants: [...f.price_variants, { ...EMPTY_VARIANT }] }))
@@ -64,16 +110,34 @@ export default function AdminPlansPage() {
     if (!form.name.trim()) { toast.error('Plan name required'); return }
     if (form.price_variants.length === 0) { toast.error('At least one price variant required'); return }
     setSaving(true)
+
+    let finalImageUrl = form.image_url || null
+
+    // Upload new image if selected
+    if (imageFile) {
+      const fd = new FormData()
+      fd.append('file', imageFile)
+      const uploadRes = await fetch('/api/admin/upload-image', { method: 'POST', body: fd })
+      if (!uploadRes.ok) {
+        const { error } = await uploadRes.json()
+        toast.error(error || 'Image upload failed')
+        setSaving(false)
+        return
+      }
+      const { url } = await uploadRes.json()
+      finalImageUrl = url
+    }
+
     const method = editing ? 'PATCH' : 'POST'
     const url = editing ? `/api/admin/plans/${editing.id}` : '/api/admin/plans'
     const res = await fetch(url, {
       method,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
+      body: JSON.stringify({ ...form, image_url: finalImageUrl }),
     })
     if (res.ok) {
       toast.success(editing ? 'Plan updated!' : 'Plan created!')
-      setShowForm(false)
+      closeForm()
       await loadPlans()
     } else {
       const { error } = await res.json()
@@ -98,6 +162,8 @@ export default function AdminPlansPage() {
     await loadPlans()
   }
 
+  const displayImage = imagePreview || (form.image_url || null)
+
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="flex items-center justify-between mb-6">
@@ -118,15 +184,23 @@ export default function AdminPlansPage() {
           : plans.map((plan) => (
               <div key={plan.id} className={`glass rounded-xl p-5 ${!plan.active ? 'opacity-50' : ''}`}>
                 <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <h3 className="font-semibold text-white">{plan.name}</h3>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-xs text-zinc-500 bg-zinc-800 px-2 py-0.5 rounded">{plan.category}</span>
-                      {plan.badge && <span className="text-xs text-purple-400 bg-purple-400/10 px-2 py-0.5 rounded">{plan.badge}</span>}
-                      {plan.featured && <span className="text-xs text-amber-400">★ Featured</span>}
+                  <div className="flex items-center gap-3">
+                    {/* Plan image thumbnail */}
+                    {plan.image_url && (
+                      <div className="w-10 h-10 rounded-lg overflow-hidden bg-zinc-800 shrink-0">
+                        <img src={plan.image_url} alt={plan.name} className="w-full h-full object-cover" />
+                      </div>
+                    )}
+                    <div>
+                      <h3 className="font-semibold text-white">{plan.name}</h3>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-xs text-zinc-500 bg-zinc-800 px-2 py-0.5 rounded">{plan.category}</span>
+                        {plan.badge && <span className="text-xs text-purple-400 bg-purple-400/10 px-2 py-0.5 rounded">{plan.badge}</span>}
+                        {plan.featured && <span className="text-xs text-amber-400">★ Featured</span>}
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1 shrink-0 ml-2">
                     <button onClick={() => openEdit(plan)} className="p-1.5 text-zinc-500 hover:text-blue-400 hover:bg-blue-400/10 rounded-lg transition-all">
                       <Edit2 className="w-3.5 h-3.5" />
                     </button>
@@ -181,9 +255,9 @@ export default function AdminPlansPage() {
               exit={{ scale: 0.95, y: 20 }}
               className="glass border border-white/10 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
             >
-              <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 sticky top-0 bg-zinc-950/90 backdrop-blur-sm">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 sticky top-0 bg-zinc-950/90 backdrop-blur-sm z-10">
                 <h2 className="font-bold text-white">{editing ? 'Edit Plan' : 'Add New Plan'}</h2>
-                <button onClick={() => setShowForm(false)} className="text-zinc-500 hover:text-white p-1">
+                <button onClick={closeForm} className="text-zinc-500 hover:text-white p-1">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -225,6 +299,67 @@ export default function AdminPlansPage() {
                       <span className="text-sm text-zinc-300">Active</span>
                     </label>
                   </div>
+                </div>
+
+                {/* Image Upload */}
+                <div>
+                  <label className="text-xs font-medium text-zinc-400 block mb-2">Product Image (JPG, PNG — max 3 MB)</label>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+                    className="hidden"
+                    onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFileSelect(f) }}
+                  />
+
+                  {displayImage ? (
+                    <div className="relative rounded-xl overflow-hidden border border-white/10 bg-zinc-900">
+                      <img
+                        src={displayImage}
+                        alt="Product preview"
+                        className="w-full h-40 object-contain bg-zinc-900"
+                      />
+                      <div className="absolute inset-0 bg-black/0 hover:bg-black/40 transition-all flex items-center justify-center opacity-0 hover:opacity-100 gap-3">
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold rounded-lg transition-all flex items-center gap-1.5"
+                        >
+                          <Upload className="w-3.5 h-3.5" />
+                          Replace
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { resetImageState(); setForm((f) => ({ ...f, image_url: '' })) }}
+                          className="px-3 py-1.5 bg-red-600/80 hover:bg-red-600 text-white text-xs font-semibold rounded-lg transition-all flex items-center gap-1.5"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                          Remove
+                        </button>
+                      </div>
+                      {imageFile && (
+                        <div className="absolute bottom-2 left-2 bg-green-500/90 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
+                          New image selected
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div
+                      onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
+                      onDragLeave={() => setDragOver(false)}
+                      onDrop={onDrop}
+                      onClick={() => fileInputRef.current?.click()}
+                      className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${
+                        dragOver
+                          ? 'border-purple-500 bg-purple-500/10'
+                          : 'border-white/15 hover:border-purple-500/50 hover:bg-white/5'
+                      }`}
+                    >
+                      <ImageIcon className="w-8 h-8 text-zinc-600 mx-auto mb-2" />
+                      <p className="text-sm text-zinc-400 font-medium">Click to upload or drag & drop</p>
+                      <p className="text-xs text-zinc-600 mt-1">JPG, JPEG, PNG — max 3 MB</p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Price Variants */}
@@ -274,11 +409,16 @@ export default function AdminPlansPage() {
                 </div>
 
                 <div className="flex gap-3 pt-2">
-                  <button onClick={() => setShowForm(false)} className="flex-1 py-3 border border-white/20 text-zinc-400 hover:text-white rounded-xl transition-all">
+                  <button onClick={closeForm} className="flex-1 py-3 border border-white/20 text-zinc-400 hover:text-white rounded-xl transition-all">
                     Cancel
                   </button>
-                  <button onClick={savePlan} disabled={saving} className="flex-1 py-3 bg-purple-600 hover:bg-purple-500 disabled:opacity-60 text-white font-semibold rounded-xl transition-all">
-                    {saving ? 'Saving...' : (editing ? 'Update Plan' : 'Create Plan')}
+                  <button onClick={savePlan} disabled={saving} className="flex-1 py-3 bg-purple-600 hover:bg-purple-500 disabled:opacity-60 text-white font-semibold rounded-xl transition-all flex items-center justify-center gap-2">
+                    {saving ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        {imageFile ? 'Uploading...' : 'Saving...'}
+                      </>
+                    ) : (editing ? 'Update Plan' : 'Create Plan')}
                   </button>
                 </div>
               </div>
