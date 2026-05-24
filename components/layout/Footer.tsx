@@ -28,8 +28,8 @@ export default function Footer() {
                 <Tv className="w-4 h-4 text-white" />
               </div>
               <span className="font-bold text-lg">
-                <span className="gradient-text">Stream</span>
-                <span className="text-white">Zone</span>
+                <span className="gradient-text">DIGITAL</span>
+                <span className="text-white"> OTT</span>
               </span>
             </Link>
             <p className="text-sm text-zinc-500 leading-relaxed mb-4">

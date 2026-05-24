@@ -110,15 +110,7 @@ body {
   border-radius: 6px;
 }
 
-/* Activity ticker scroll */
-@keyframes ticker-scroll {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-.ticker-track {
-  animation: ticker-scroll 60s linear infinite;
-  display: inline-flex;
-}
+/* Activity ticker — scrolled via JS, no CSS animation */
 
 /* Floating animation */
 @keyframes float {

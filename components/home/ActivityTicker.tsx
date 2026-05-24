@@ -13,19 +13,16 @@ const NAMES = [
   'Nitin','Renu','Bharat','Sudha','Kapil','Chhaya','Satish','Bharti','Anil','Pushpa',
   'Tarun','Saroj','Lokesh','Urmila','Yogesh','Savitri','Mukesh','Kamla','Kamlesh','Sheela',
 ]
-
 const CITIES = [
   'Delhi','Mumbai','Bangalore','Chennai','Hyderabad','Pune','Kolkata','Ahmedabad',
   'Jaipur','Lucknow','Surat','Bhopal','Indore','Nagpur','Patna','Vadodara',
   'Ludhiana','Agra','Nashik','Faridabad','Meerut','Rajkot','Varanasi','Amritsar',
 ]
-
 const PLANS = [
   'Netflix','Amazon Prime','Hotstar','Jio Hotstar','Spotify','YouTube Premium',
-  'Zee5','SonyLIV','JioCinema','MX Player','Apple TV+','Crunchyroll',
+  'Zee5','SonyLIV','JioCinema','Apple TV+',
 ]
-
-const VARIANTS = ['1 Month','3 Months','6 Months','12 Months','1 Year']
+const VARIANTS = ['1 Month','3 Months','6 Months','12 Months']
 
 function rand<T>(arr: T[]): T { return arr[Math.floor(Math.random() * arr.length)] }
 
@@ -36,50 +33,11 @@ function timeAgo(date: Date): string {
   const mins = Math.floor(diff / 60)
   if (mins < 60) return `${mins} min ago`
   const hrs = Math.floor(mins / 60)
-  if (hrs < 24) return `${hrs} hr ago`
-  return `${Math.floor(hrs / 24)} days ago`
+  return hrs < 24 ? `${hrs} hr ago` : `${Math.floor(hrs / 24)}d ago`
 }
 
-interface RealOrder {
-  plan_name: string
-  plan_variant: { label?: string } | null
-  created_at: string
-}
-
-interface TickerEntry {
-  name: string
-  city: string
-  plan: string
-  variant: string
-  time: string
-}
-
-function buildFakeEntries(): TickerEntry[] {
-  return Array.from({ length: 100 }, () => {
-    const minsAgo = Math.floor(Math.random() * 120)
-    const secsAgo = Math.floor(Math.random() * 59)
-    let time: string
-    if (minsAgo === 0) time = secsAgo < 10 ? 'just now' : `${secsAgo} sec ago`
-    else time = `${minsAgo} min ago`
-    return {
-      name: rand(NAMES),
-      city: rand(CITIES),
-      plan: rand(PLANS),
-      variant: rand(VARIANTS),
-      time,
-    }
-  })
-}
-
-function buildRealEntries(orders: RealOrder[]): TickerEntry[] {
-  return orders.map((o) => ({
-    name: rand(NAMES),
-    city: rand(CITIES),
-    plan: o.plan_name,
-    variant: (o.plan_variant as { label?: string })?.label || rand(VARIANTS),
-    time: timeAgo(new Date(o.created_at)),
-  }))
-}
+interface Entry { name: string; city: string; plan: string; variant: string; time: string }
+interface RealOrder { plan_name: string; plan_variant: { label?: string } | null; created_at: string }
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr]
@@ -91,45 +49,88 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export default function ActivityTicker() {
-  const [entries, setEntries] = useState<TickerEntry[]>([])
-  const trackRef = useRef<HTMLDivElement>(null)
+  const [entries, setEntries] = useState<Entry[]>([])
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const posRef = useRef(0)
+  const rafRef = useRef<number>(0)
+  const pausedRef = useRef(false)
 
   useEffect(() => {
-    const fake = buildFakeEntries()
-    // Fetch real orders
+    // Build fake entries
+    const fake: Entry[] = Array.from({ length: 30 }, () => {
+      const minsAgo = Math.floor(Math.random() * 120)
+      const secsAgo = Math.floor(Math.random() * 59)
+      const time = minsAgo === 0
+        ? (secsAgo < 5 ? 'just now' : `${secsAgo} sec ago`)
+        : `${minsAgo} min ago`
+      return { name: rand(NAMES), city: rand(CITIES), plan: rand(PLANS), variant: rand(VARIANTS), time }
+    })
+
     fetch('/api/activity')
       .then(r => r.json())
       .then((real: RealOrder[]) => {
-        const realEntries = buildRealEntries(real)
-        const combined = shuffle([...fake, ...realEntries])
-        setEntries(combined)
+        const realEntries: Entry[] = real.map(o => ({
+          name: rand(NAMES),
+          city: rand(CITIES),
+          plan: o.plan_name,
+          variant: (o.plan_variant as { label?: string })?.label || rand(VARIANTS),
+          time: timeAgo(new Date(o.created_at)),
+        }))
+        setEntries(shuffle([...fake, ...realEntries]).slice(0, 40))
       })
-      .catch(() => {
-        setEntries(shuffle(fake))
-      })
+      .catch(() => setEntries(shuffle(fake)))
   }, [])
+
+  // JS scroll — no CSS animation
+  useEffect(() => {
+    if (entries.length === 0) return
+    const el = scrollRef.current
+    if (!el) return
+
+    const SPEED = 0.5 // px per frame
+
+    function step() {
+      if (!el || pausedRef.current) { rafRef.current = requestAnimationFrame(step); return }
+      posRef.current += SPEED
+      // Reset when we've scrolled half (since content is doubled)
+      if (posRef.current >= el.scrollWidth / 2) posRef.current = 0
+      el.scrollLeft = posRef.current
+      rafRef.current = requestAnimationFrame(step)
+    }
+
+    rafRef.current = requestAnimationFrame(step)
+    return () => cancelAnimationFrame(rafRef.current)
+  }, [entries])
 
   if (entries.length === 0) return null
 
-  // Only take 20 entries max to keep DOM light, duplicate for seamless loop
-  const slice = entries.slice(0, 20)
-  const doubled = [...slice, ...slice]
+  const doubled = [...entries, ...entries]
 
   return (
-    <div className="w-full overflow-hidden bg-zinc-950/80 border-y border-white/5 py-2 select-none">
-      <div className="flex items-center whitespace-nowrap ticker-track">
-        {doubled.map((e, i) => (
-          <span key={i} className="inline-flex items-center gap-1.5 px-4 text-[11px] text-zinc-400 shrink-0">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-400 shrink-0" />
-            <span className="text-white font-medium">{e.name}</span>
-            <span>from</span>
-            <span className="text-purple-400">{e.city}</span>
-            <span>bought</span>
-            <span className="text-white">{e.plan}</span>
-            <span className="text-zinc-500">{e.variant}</span>
-            <span className="text-zinc-600 mx-2">·</span>
-          </span>
-        ))}
+    <div className="w-full bg-zinc-950 border-b border-white/5 py-2 select-none">
+      <div
+        ref={scrollRef}
+        className="overflow-hidden whitespace-nowrap"
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        onMouseEnter={() => { pausedRef.current = true }}
+        onMouseLeave={() => { pausedRef.current = false }}
+      >
+        <div className="inline-flex items-center">
+          {doubled.map((e, i) => (
+            <span key={i} className="inline-flex items-center gap-1.5 px-4 text-[11px] text-zinc-400 shrink-0">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-400 shrink-0" />
+              <span className="text-white font-medium">{e.name}</span>
+              <span>from</span>
+              <span className="text-purple-400">{e.city}</span>
+              <span>bought</span>
+              <span className="text-white">{e.plan}</span>
+              <span className="text-zinc-500">{e.variant}</span>
+              <span className="text-zinc-700 mx-1">·</span>
+              <span className="text-zinc-600">{e.time}</span>
+              <span className="text-zinc-800 ml-3">|</span>
+            </span>
+          ))}
+        </div>
       </div>
     </div>
   )
