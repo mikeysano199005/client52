@@ -7,6 +7,7 @@ import {
   Star, ShoppingCart, Zap, ChevronRight, BadgeCheck,
   MessageCircle, Shield, Clock, RefreshCw
 } from 'lucide-react'
+import BackButton from '@/components/ui/BackButton'
 import { useCartStore } from '@/store/cartStore'
 import { formatPrice, getDiscount, ORDER_STATUS_LABELS } from '@/lib/utils'
 import { getPlanLogo, getPlanCardBg } from '@/lib/logos'
@@ -124,8 +125,10 @@ export default function ProductPage() {
       <Navbar user={user} />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-16 sm:pb-20">
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-xs text-zinc-500 mb-6">
+        {/* Back + Breadcrumb */}
+        <div className="flex items-center gap-3 mb-6">
+          <BackButton />
+          <div className="flex items-center gap-2 text-xs text-zinc-500">
           <Link href="/" className="hover:text-purple-400">Home</Link>
           <ChevronRight className="w-3 h-3" />
           <Link href={`/category/${plan.category.toLowerCase()}`} className="hover:text-purple-400">
@@ -133,6 +136,7 @@ export default function ProductPage() {
           </Link>
           <ChevronRight className="w-3 h-3" />
           <span className="text-zinc-300">{plan.name}</span>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">

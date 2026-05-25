@@ -9,6 +9,7 @@ import { getPlanLogo, getPlanCardBg } from '@/lib/logos'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import SupportWidget from '@/components/support/SupportWidget'
+import BackButton from '@/components/ui/BackButton'
 import toast from 'react-hot-toast'
 
 interface UserData {
@@ -146,7 +147,10 @@ export default function CheckoutPage() {
     <div className="min-h-screen">
       <Navbar user={user ? { name: user.name, role: user.role, wallet_balance: user.wallet_balance } : null} />
       <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-24 pb-20">
-        <h1 className="text-2xl font-bold text-white mb-6">Checkout</h1>
+        <div className="flex items-center gap-3 mb-6">
+          <BackButton href="/cart" />
+          <h1 className="text-2xl font-bold text-white">Checkout</h1>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Mobile: order summary first */}

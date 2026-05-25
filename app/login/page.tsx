@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Tv, Eye, EyeOff, LogIn, Mail, ArrowLeft, CheckCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
 import GoogleButton from '@/components/auth/GoogleButton'
+import BackButton from '@/components/ui/BackButton'
 
 const OAUTH_ERRORS: Record<string, string> = {
   google_cancelled: 'Google sign-in was cancelled.',
@@ -282,6 +283,10 @@ function LoginForm() {
     <div className="min-h-screen flex items-center justify-center px-4 bg-[#09090b]">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl" />
+      </div>
+
+      <div className="absolute top-4 left-4">
+        <BackButton href="/" />
       </div>
 
       <motion.div

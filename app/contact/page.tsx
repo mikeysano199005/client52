@@ -2,6 +2,7 @@ import { supabaseAdmin } from '@/lib/supabase'
 import { getSession } from '@/lib/auth'
 import Link from 'next/link'
 import { MessageCircle, Send, Clock, Shield, Headphones } from 'lucide-react'
+import BackButton from '@/components/ui/BackButton'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 
@@ -16,6 +17,9 @@ export default async function ContactPage() {
       <Navbar user={user ? { name: user.name, role: user.role, wallet_balance: user.wallet_balance } : null} />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 pt-24 pb-20">
+        <div className="mb-6">
+          <BackButton href="/" />
+        </div>
         <div className="text-center mb-12">
           <h1 className="text-3xl font-bold text-white mb-3">Contact Support</h1>
           <p className="text-zinc-400">We&apos;re available 24/7 to help you</p>

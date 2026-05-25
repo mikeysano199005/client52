@@ -2,6 +2,7 @@ import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import { getSession } from '@/lib/auth'
 import { FileText, ShieldAlert, CreditCard, AlertTriangle, Settings, HeadphonesIcon } from 'lucide-react'
+import BackButton from '@/components/ui/BackButton'
 
 export const metadata = {
   title: 'Terms of Service — DIGITAL OTT',
@@ -16,6 +17,9 @@ export default async function TermsPage() {
       <Navbar user={user ? { name: user.name, role: user.role, wallet_balance: user.wallet_balance } : null} />
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-28 pb-24">
+        <div className="mb-6">
+          <BackButton href="/" />
+        </div>
         {/* Header */}
         <div className="mb-10">
           <div className="inline-flex items-center gap-2 bg-purple-600/10 border border-purple-500/20 text-purple-400 text-xs font-semibold px-3 py-1.5 rounded-full mb-4">

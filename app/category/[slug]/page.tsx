@@ -6,6 +6,7 @@ import FloatingButtons from '@/components/layout/FloatingButtons'
 import ProductCard from '@/components/product/ProductCard'
 import type { Plan } from '@/types'
 import { CATEGORIES } from '@/lib/utils'
+import BackButton from '@/components/ui/BackButton'
 
 export default async function CategoryPage({
   params,
@@ -32,8 +33,11 @@ export default async function CategoryPage({
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-20">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-white capitalize">{category} Plans</h1>
-          <p className="text-zinc-500 text-sm mt-1">{plans.length} plans available</p>
+          <div className="flex items-center gap-3 mb-3">
+            <BackButton href="/" />
+            <h1 className="text-2xl font-bold text-white capitalize">{category} Plans</h1>
+          </div>
+          <p className="text-zinc-500 text-sm">{plans.length} plans available</p>
         </div>
 
         {plans.length === 0 ? (

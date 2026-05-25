@@ -6,6 +6,7 @@ import Footer from '@/components/layout/Footer'
 import { Users, Copy, Gift, CheckCircle, Clock } from 'lucide-react'
 import { formatPrice, formatDate } from '@/lib/utils'
 import type { Referral } from '@/types'
+import BackButton from '@/components/ui/BackButton'
 
 export default async function ReferralPage() {
   const user = await getSession()
@@ -29,7 +30,10 @@ export default async function ReferralPage() {
     <div className="min-h-screen">
       <Navbar user={{ name: user.name, role: user.role, wallet_balance: user.wallet_balance }} />
       <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-20">
-        <h1 className="text-2xl font-bold text-white mb-6">Referral Program</h1>
+        <div className="flex items-center gap-3 mb-6">
+          <BackButton href="/dashboard" />
+          <h1 className="text-2xl font-bold text-white">Referral Program</h1>
+        </div>
 
         <div className="glass rounded-2xl p-6 mb-6 bg-gradient-to-br from-purple-500/10 to-cyan-500/10 border border-purple-500/20">
           <div className="flex items-start gap-4">

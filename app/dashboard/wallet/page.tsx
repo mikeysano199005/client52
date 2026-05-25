@@ -10,6 +10,7 @@ import {
 import { formatPrice, formatDateTime } from '@/lib/utils'
 import type { WalletTransaction, WalletTopup } from '@/types'
 import toast from 'react-hot-toast'
+import BackButton from '@/components/ui/BackButton'
 
 const PRESETS = [50, 100, 200, 500, 1000]
 
@@ -140,7 +141,10 @@ export default function WalletPage() {
       <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-20">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-white">My Wallet</h1>
+          <div className="flex items-center gap-3">
+            <BackButton href="/dashboard" />
+            <h1 className="text-2xl font-bold text-white">My Wallet</h1>
+          </div>
           <button
             onClick={() => setShowForm(!showForm)}
             className="flex items-center gap-2 px-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-semibold text-sm transition-all"
