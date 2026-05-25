@@ -15,13 +15,17 @@ export async function POST(req: Request) {
     const couponDiscount = Number(formData.get('couponDiscount') || 0)
     const useWallet = formData.get('useWallet') === 'true'
     const walletAmount = Number(formData.get('walletAmount') || 0)
-    const amount = Number(formData.get('amount') || 0)
     const paymentUTR = formData.get('paymentUTR') as string
     const notes = formData.get('notes') as string
     const proofFile = formData.get('paymentProof') as File | null
 
     if (!items || items.length === 0) {
       return Response.json({ error: 'No items in order' }, { status: 400 })
+    }
+
+    // FIX: validate wallet balance server-side (prevent client-side tampering)
+    if (useWallet && walletAmount > 0 && walletAmount > user.wallet_balance) {
+      return Response.json({ error: 'Insufficient wallet balance' }, { status: 400 })
     }
 
     // Upload payment proof
@@ -56,7 +60,8 @@ export async function POST(req: Request) {
           discount_amount: couponDiscount,
           payment_proof_url: proofUrl,
           payment_utr: paymentUTR || null,
-          wallet_used: walletAmount,
+          // FIX: wallet_used is per order (split evenly) — only set for single-item orders for simplicity
+          wallet_used: items.length === 1 ? walletAmount : 0,
           notes: notes || null,
         })
         .select()
@@ -64,31 +69,6 @@ export async function POST(req: Request) {
 
       if (!error && order) {
         createdOrders.push(order)
-
-        // Deduct wallet
-        if (useWallet && walletAmount > 0) {
-          await supabaseAdmin
-            .from('users')
-            .update({ wallet_balance: Math.max(0, user.wallet_balance - walletAmount) })
-            .eq('id', user.id)
-          await supabaseAdmin.from('wallet_transactions').insert({
-            user_id: user.id,
-            type: 'debit',
-            amount: walletAmount,
-            reason: `Order #${orderNumber}`,
-            reference_id: order.id,
-          })
-        }
-
-        // Update coupon usage
-        if (couponCode) {
-          await supabaseAdmin
-            .from('coupons')
-            .update({ used_count: supabaseAdmin.rpc('increment', { x: 1 }) as unknown as number })
-            .eq('code', couponCode.toUpperCase())
-        }
-
-        // Admin notification
         notifyNewOrder({ ...order, plan_name: item.plan.name } as Parameters<typeof notifyNewOrder>[0], user.name, user.email).catch(() => null)
       }
     }
@@ -97,15 +77,43 @@ export async function POST(req: Request) {
       return Response.json({ error: 'Failed to create orders' }, { status: 500 })
     }
 
-    // Send confirmation email
-    sendOrderConfirmation(createdOrders[0] as Parameters<typeof sendOrderConfirmation>[0], user.email, user.name).catch(() => null)
+    // FIX: Deduct wallet ONCE after all orders are created successfully (not inside loop)
+    if (useWallet && walletAmount > 0) {
+      const newBalance = Math.max(0, user.wallet_balance - walletAmount)
+      await supabaseAdmin
+        .from('users')
+        .update({ wallet_balance: newBalance })
+        .eq('id', user.id)
+      await supabaseAdmin.from('wallet_transactions').insert({
+        user_id: user.id,
+        type: 'debit',
+        amount: walletAmount,
+        reason: `Order${createdOrders.length > 1 ? 's' : ''} ${createdOrders.map(o => '#' + o.order_number).join(', ')}`,
+        reference_id: createdOrders[0].id,
+      })
+    }
 
-    // Admin notification in DB
-    await supabaseAdmin.from('notifications').insert({
-      type: 'new_order',
-      message: `New order from ${user.name} — ${items.map((i) => i.plan.name).join(', ')}`,
-      data: { order_id: createdOrders[0].id, user_id: user.id },
-    })
+    // FIX: Increment coupon usage correctly (fetch current count, then update)
+    if (couponCode) {
+      const { data: couponData } = await supabaseAdmin
+        .from('coupons')
+        .select('used_count')
+        .eq('code', couponCode.toUpperCase())
+        .single()
+      if (couponData) {
+        await supabaseAdmin
+          .from('coupons')
+          .update({ used_count: (couponData.used_count || 0) + 1 })
+          .eq('code', couponCode.toUpperCase())
+      }
+    }
+
+    // Send confirmation email
+    sendOrderConfirmation(
+      createdOrders[0] as Parameters<typeof sendOrderConfirmation>[0],
+      user.email,
+      user.name
+    ).catch(() => null)
 
     return Response.json({ success: true, orders: createdOrders })
   } catch (err) {

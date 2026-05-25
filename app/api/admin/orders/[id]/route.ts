@@ -1,7 +1,7 @@
 import { supabaseAdmin } from '@/lib/supabase'
 import { requireAdmin } from '@/lib/auth'
 import { sendAccountDelivery, sendPaymentVerified, sendOrderCancelled } from '@/lib/email'
-import { notifyLowStock } from '@/lib/telegram'
+import { notifyLowStock, notifyOrderStatusChange } from '@/lib/telegram'
 
 export async function PATCH(
   req: Request,
@@ -114,14 +114,16 @@ export async function PATCH(
 
     if (error) return Response.json({ error: error.message }, { status: 500 })
 
-    // Trigger status-change emails
-    if (order.users) {
-      if (status === 'processing' && order.status !== 'processing') {
+    // Trigger status-change emails + Telegram notification
+    if (order.users && status !== order.status) {
+      if (status === 'processing') {
         sendPaymentVerified(data, order.users.email, order.users.name).catch(() => null)
       }
-      if (status === 'cancelled' && order.status !== 'cancelled') {
+      if (status === 'cancelled') {
         sendOrderCancelled(data, order.users.email, order.users.name, admin_notes).catch(() => null)
       }
+      // Telegram notify on every status change
+      notifyOrderStatusChange(data, order.users.name).catch(() => null)
     }
 
     return Response.json({ order: data })

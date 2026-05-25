@@ -15,7 +15,7 @@ async function sendOTPEmail(email: string, code: string) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: process.env.EMAIL_FROM || 'noreply@digitalott.in',
+      from: process.env.EMAIL_FROM || 'onboarding@resend.dev',
       to: email,
       subject: `${code} — Your DIGITAL OTT login code`,
       html: `

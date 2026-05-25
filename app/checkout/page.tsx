@@ -29,8 +29,8 @@ export default function CheckoutPage() {
   const [couponApplied, setCouponApplied] = useState(false)
   const [useWallet, setUseWallet] = useState(false)
   const [walletAmount, setWalletAmount] = useState(0)
-  const [upiId, setUpiId] = useState('whoisnaseem@fam')
-  const [upiName, setUpiName] = useState('NASEEM AKHTER')
+  const [upiId, setUpiId] = useState('')
+  const [upiName, setUpiName] = useState('')
   const [paymentProof, setPaymentProof] = useState<File | null>(null)
   const [paymentUTR, setPaymentUTR] = useState('')
   const [notes, setNotes] = useState('')
@@ -211,8 +211,16 @@ export default function CheckoutPage() {
                     <div className="flex items-center justify-between gap-2 mb-3">
                       <div className="min-w-0">
                         <p className="text-[10px] text-zinc-500 uppercase tracking-wider">UPI ID</p>
-                        <p className="font-bold text-white text-base font-mono break-all">{upiId}</p>
-                        <p className="text-xs text-zinc-400 mt-0.5">Name: <span className="text-white font-semibold">{upiName}</span></p>
+                        {upiId ? (
+                          <p className="font-bold text-white text-base font-mono break-all">{upiId}</p>
+                        ) : (
+                          <div className="h-6 w-40 skeleton rounded mt-1" />
+                        )}
+                        {upiName ? (
+                          <p className="text-xs text-zinc-400 mt-0.5">Name: <span className="text-white font-semibold">{upiName}</span></p>
+                        ) : (
+                          <div className="h-4 w-28 skeleton rounded mt-1" />
+                        )}
                       </div>
                       <button
                         onClick={() => { navigator.clipboard.writeText(upiId); toast.success('UPI ID copied!') }}
@@ -274,7 +282,15 @@ export default function CheckoutPage() {
                     type="file"
                     accept="image/*"
                     className="hidden"
-                    onChange={(e) => setPaymentProof(e.target.files?.[0] || null)}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0] || null
+                      if (file && file.size > 5 * 1024 * 1024) {
+                        toast.error('File too large — max 5MB')
+                        e.target.value = ''
+                        return
+                      }
+                      setPaymentProof(file)
+                    }}
                   />
                 </div>
 

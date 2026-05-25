@@ -36,12 +36,13 @@ export async function POST(req: NextRequest) {
     const payload = getPayload(token)
     if (payload && typeof payload.sub === 'string') {
       userId = payload.sub
-      // Check if user has ordered this plan
+      // FIX: check plan_id directly on orders (no "items" array column)
       const { count } = await supabaseAdmin
         .from('orders')
         .select('id', { count: 'exact', head: true })
         .eq('user_id', userId)
-        .contains('items', [{ plan_id }])
+        .eq('plan_id', plan_id)
+        .eq('status', 'delivered')
       verified = (count ?? 0) > 0
     }
   }

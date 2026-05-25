@@ -56,12 +56,18 @@ export async function POST(req: Request) {
       return Response.json({ error: 'Failed to create account' }, { status: 500 })
     }
 
-    // Track referral
+    // Track referral — reward amount from admin settings (fallback 20)
     if (referrerId) {
+      const { data: rewardSetting } = await supabaseAdmin
+        .from('settings')
+        .select('value')
+        .eq('key', 'referral_reward')
+        .single()
+      const rewardAmount = Number(rewardSetting?.value) || 20
       await supabaseAdmin.from('referrals').insert({
         referrer_id: referrerId,
         referred_id: user.id,
-        reward_amount: 20,
+        reward_amount: rewardAmount,
         status: 'pending',
       })
     }
