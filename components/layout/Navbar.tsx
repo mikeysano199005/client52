@@ -22,8 +22,10 @@ export default function Navbar({ user }: NavbarProps) {
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const cartCount = useCartStore((s) => s.count())
   const router = useRouter()
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
     const handler = () => setScrolled(window.scrollY > 10)
     window.addEventListener('scroll', handler)
     return () => window.removeEventListener('scroll', handler)
@@ -93,7 +95,7 @@ export default function Navbar({ user }: NavbarProps) {
                 className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition-all relative"
               >
                 <ShoppingCart className="w-4.5 h-4.5" />
-                {cartCount > 0 && (
+                {mounted && cartCount > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-purple-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                     {cartCount}
                   </span>

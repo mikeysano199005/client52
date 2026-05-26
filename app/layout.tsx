@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Geist } from 'next/font/google'
+import Script from 'next/script'
 import './globals.css'
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import ThemedToaster from '@/components/ui/ThemedToaster'
@@ -29,7 +30,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={geist.variable} suppressHydrationWarning>
       <body className="min-h-screen antialiased">
         {/* Prevent flash: apply saved theme before React hydrates */}
-        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('sz-theme');if(t==='light')document.documentElement.classList.add('light')}catch(e){}})()` }} />
+        <Script
+          id="theme-init"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('sz-theme');if(t==='light')document.documentElement.classList.add('light')}catch(e){}})()` }}
+        />
         <ThemeProvider>
           {children}
           <ThemedToaster />
