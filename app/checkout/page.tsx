@@ -118,18 +118,42 @@ export default function CheckoutPage() {
 
   if (placed) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="min-h-screen flex items-center justify-center px-4 py-20">
         <Navbar user={user ? { name: user.name, role: user.role, wallet_balance: user.wallet_balance } : null} />
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-center max-w-md"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center max-w-sm w-full"
         >
           <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle className="w-10 h-10 text-green-400" />
           </div>
-          <h1 className="text-2xl font-bold text-white mb-3">Order Placed! 🎉</h1>
-          <p className="text-zinc-400 mb-6">We received your order and will process it shortly. You&apos;ll receive your credentials via email once verified.</p>
+          <h1 className="text-2xl font-bold text-white mb-2">Order Placed! 🎉</h1>
+          <p className="text-zinc-400 mb-6 text-sm">We received your order and will process it shortly. You&apos;ll receive your credentials via email once verified.</p>
+
+          {/* Payment QR reference */}
+          <div className="glass rounded-2xl p-5 mb-6 text-left">
+            <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-3 text-center">Payment Reference</p>
+            <div className="flex flex-col items-center gap-3">
+              <div className="bg-white rounded-2xl p-3 w-40 h-40 flex items-center justify-center">
+                <img
+                  src="/payment-qr.png"
+                  alt="Payment QR"
+                  className="w-full h-full object-contain"
+                  onError={(e) => { (e.target as HTMLImageElement).parentElement!.style.display = 'none' }}
+                />
+              </div>
+              {upiId && (
+                <div className="text-center">
+                  <p className="text-[10px] text-zinc-500 uppercase tracking-wider">UPI ID</p>
+                  <p className="text-white font-mono font-semibold text-sm">{upiId}</p>
+                  {upiName && <p className="text-xs text-zinc-400">{upiName}</p>}
+                </div>
+              )}
+              <p className="text-[11px] text-zinc-500 text-center">If payment is pending, complete it now using the QR or UPI ID above.</p>
+            </div>
+          </div>
+
           <div className="flex flex-col gap-3">
             <button onClick={() => router.push('/dashboard/orders')} className="py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-semibold transition-all">
               Track Your Order
