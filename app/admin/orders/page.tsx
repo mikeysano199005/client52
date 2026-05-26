@@ -2,7 +2,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
-  Search, X, CheckCircle, Package, User, Eye, EyeOff, ChevronRight, ChevronDown, RotateCcw
+  Search, X, CheckCircle, Package, User, Eye, EyeOff, ChevronRight, ChevronDown, RotateCcw,
+  BadgeDollarSign, RefreshCcw, AlertTriangle
 } from 'lucide-react'
 import { formatPrice, formatDateTime, ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '@/lib/utils'
 import type { Order } from '@/types'
@@ -154,6 +155,22 @@ export default function AdminOrdersPage() {
     setUpdating(false)
   }
 
+  async function handleDismissRequest() {
+    if (!selected) return
+    setUpdating(true)
+    const res = await fetch(`/api/admin/orders/${selected.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'dismiss_request' }),
+    })
+    if (res.ok) {
+      toast.success('Request dismissed.')
+      await refreshOrders()
+      closeModal()
+    } else toast.error('Failed to dismiss')
+    setUpdating(false)
+  }
+
   async function handleRefund() {
     if (!selected) return
     if (!confirm(`Refund ₹${selected.amount} to customer wallet and cancel this order?`)) return
@@ -244,7 +261,14 @@ export default function AdminOrdersPage() {
               ) : (
                 orders.map((order: OrderWithAccount) => (
                   <tr key={order.id} className="hover:bg-white/5 transition-colors">
-                    <td className="px-4 py-3 text-xs font-mono text-zinc-400">#{order.order_number}</td>
+                    <td className="px-4 py-3 text-xs font-mono text-zinc-400">
+                      <div className="flex items-center gap-1.5">
+                        {(order.refund_requested || order.replacement_requested) && (
+                          <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0" title={order.refund_requested ? 'Refund requested' : 'Replacement requested'} />
+                        )}
+                        #{order.order_number}
+                      </div>
+                    </td>
                     <td className="px-4 py-3">
                       <p className="text-sm text-white">{order.plan_name}</p>
                       <p className="text-xs text-zinc-500">{(order.plan_variant as { label?: string })?.label}</p>
@@ -308,6 +332,58 @@ export default function AdminOrdersPage() {
               </div>
 
               <div className="p-6 space-y-4">
+
+                {/* ── Customer Request Alert ── */}
+                {(selected.refund_requested || selected.replacement_requested) && (
+                  <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                      <p className="text-sm font-semibold text-amber-400">Customer Request Pending</p>
+                    </div>
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {selected.refund_requested && (
+                        <span className="flex items-center gap-1.5 text-xs px-2 py-1 bg-red-500/20 border border-red-500/30 text-red-400 rounded-full font-medium">
+                          <BadgeDollarSign className="w-3 h-3" /> Refund Requested
+                        </span>
+                      )}
+                      {selected.replacement_requested && (
+                        <span className="flex items-center gap-1.5 text-xs px-2 py-1 bg-blue-500/20 border border-blue-500/30 text-blue-400 rounded-full font-medium">
+                          <RefreshCcw className="w-3 h-3" /> Replacement Requested
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      {selected.refund_requested && (
+                        <button
+                          onClick={handleRefund}
+                          disabled={updating}
+                          className="flex-1 py-2 bg-red-600/20 hover:bg-red-600/40 border border-red-500/30 text-red-400 rounded-xl text-xs font-semibold transition-all disabled:opacity-50 flex items-center justify-center gap-1.5"
+                        >
+                          <BadgeDollarSign className="w-3.5 h-3.5" />
+                          Approve Refund
+                        </button>
+                      )}
+                      {selected.replacement_requested && (
+                        <button
+                          onClick={() => startDeliver(true)}
+                          disabled={updating}
+                          className="flex-1 py-2 bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/30 text-blue-400 rounded-xl text-xs font-semibold transition-all disabled:opacity-50 flex items-center justify-center gap-1.5"
+                        >
+                          <RefreshCcw className="w-3.5 h-3.5" />
+                          Start Replacement
+                        </button>
+                      )}
+                      <button
+                        onClick={handleDismissRequest}
+                        disabled={updating}
+                        className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-400 rounded-xl text-xs font-semibold transition-all disabled:opacity-50"
+                      >
+                        Dismiss
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 {/* Order Info */}
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div><p className="text-zinc-500 text-xs">Plan</p><p className="text-white font-medium">{selected.plan_name}</p></div>

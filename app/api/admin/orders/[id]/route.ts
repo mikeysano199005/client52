@@ -21,6 +21,15 @@ export async function PATCH(
 
     if (!order) return Response.json({ error: 'Order not found' }, { status: 404 })
 
+    // ── Dismiss request flags ──
+    if (action === 'dismiss_request') {
+      await supabaseAdmin
+        .from('orders')
+        .update({ refund_requested: false, replacement_requested: false, updated_at: new Date().toISOString() })
+        .eq('id', id)
+      return Response.json({ success: true })
+    }
+
     // ── Refund action ──
     if (action === 'refund') {
       const { data: userData } = await supabaseAdmin
@@ -47,6 +56,7 @@ export async function PATCH(
         .update({
           status: 'cancelled',
           admin_notes: admin_notes || 'Refunded by admin',
+          refund_requested: false,
           updated_at: new Date().toISOString(),
         })
         .eq('id', id)
@@ -149,7 +159,13 @@ export async function PATCH(
 
     const { data, error } = await supabaseAdmin
       .from('orders')
-      .update({ status, admin_notes, account_id: accountId, updated_at: new Date().toISOString() })
+      .update({
+        status,
+        admin_notes,
+        account_id: accountId,
+        replacement_requested: status === 'delivered' ? false : undefined,
+        updated_at: new Date().toISOString(),
+      })
       .eq('id', id)
       .select()
       .single()

@@ -59,6 +59,35 @@ Please upload more accounts soon!`
   await sendMessage(ADMIN_CHAT_ID, text)
 }
 
+export async function notifyRefundRequested(order: Order, userName: string, userEmail: string) {
+  if (!ADMIN_CHAT_ID) return
+  const text = `💸 <b>Refund Requested!</b>
+
+📦 Order: <code>#${order.order_number}</code>
+👤 Customer: ${userName}
+📧 Email: ${userEmail}
+🛒 Plan: ${order.plan_name}
+💰 Amount: ₹${order.amount}
+
+👉 Review in admin panel → approve or dismiss`
+
+  await sendMessage(ADMIN_CHAT_ID, text)
+}
+
+export async function notifyReplacementRequested(order: Order, userName: string, userEmail: string) {
+  if (!ADMIN_CHAT_ID) return
+  const text = `🔄 <b>Replacement Requested!</b>
+
+📦 Order: <code>#${order.order_number}</code>
+👤 Customer: ${userName}
+📧 Email: ${userEmail}
+🛒 Plan: ${order.plan_name}
+
+👉 Review in admin panel → reassign credentials or dismiss`
+
+  await sendMessage(ADMIN_CHAT_ID, text)
+}
+
 export async function notifyNewUser(name: string, email: string) {
   if (!ADMIN_CHAT_ID) return
   const text = `👤 <b>New User Registered!</b>

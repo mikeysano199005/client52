@@ -72,6 +72,8 @@ export interface Order {
   wallet_used: number
   notes?: string
   admin_notes?: string
+  refund_requested?: boolean
+  replacement_requested?: boolean
   created_at: string
   updated_at: string
   user?: User

@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Package, ChevronLeft, RefreshCw, Copy, Eye, EyeOff, RotateCcw, XCircle } from 'lucide-react'
+import { Package, ChevronLeft, RefreshCw, Copy, Eye, EyeOff, RotateCcw, XCircle, RefreshCcw, BadgeDollarSign } from 'lucide-react'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import SupportWidget from '@/components/support/SupportWidget'
@@ -24,6 +24,8 @@ const POLL_INTERVAL = 8000
 interface UserData { name: string; role: string; wallet_balance: number }
 type FullOrder = Order & {
   account_stock: { email: string; password: string; profile_number?: string; extra_info?: string } | null
+  refund_requested?: boolean
+  replacement_requested?: boolean
 }
 
 export default function OrdersPage() {
@@ -102,6 +104,38 @@ export default function OrdersPage() {
     } else {
       const { error } = await res.json()
       toast.error(error || 'Failed to cancel order')
+    }
+  }
+
+  async function handleRequestRefund(orderId: string, orderNumber: string) {
+    if (!confirm(`Request a refund for order #${orderNumber}?\n\nAdmin will review and process your refund.`)) return
+    const res = await fetch(`/api/orders/${orderId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'request_refund' }),
+    })
+    if (res.ok) {
+      toast.success('Refund request sent! Admin will process it shortly.')
+      fetchOrders(true)
+    } else {
+      const { error } = await res.json()
+      toast.error(error || 'Failed to send request')
+    }
+  }
+
+  async function handleRequestReplacement(orderId: string, orderNumber: string) {
+    if (!confirm(`Request a replacement for order #${orderNumber}?\n\nAdmin will send you new working credentials.`)) return
+    const res = await fetch(`/api/orders/${orderId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'request_replacement' }),
+    })
+    if (res.ok) {
+      toast.success('Replacement request sent! Admin will send new credentials.')
+      fetchOrders(true)
+    } else {
+      const { error } = await res.json()
+      toast.error(error || 'Failed to send request')
     }
   }
 
@@ -310,9 +344,10 @@ export default function OrdersPage() {
                   )}
 
                   {/* Footer */}
-                  <div className="px-5 py-3 flex items-center justify-between text-xs text-zinc-500">
+                  <div className="px-5 py-3 flex flex-wrap items-center justify-between gap-2 text-xs text-zinc-500">
                     <span>Plan: {(order.plan_variant as { label?: string })?.label || '—'} • Wallet used: {formatPrice(order.wallet_used)}</span>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      {/* Cancel — payment_submitted only */}
                       {order.status === 'payment_submitted' && (
                         <button
                           onClick={() => handleCancelOrder(order.id, order.order_number, order.wallet_used)}
@@ -322,6 +357,44 @@ export default function OrdersPage() {
                           Cancel Order
                         </button>
                       )}
+
+                      {/* Request Refund — delivered only */}
+                      {order.status === 'delivered' && (
+                        order.refund_requested ? (
+                          <span className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 border border-white/10 text-zinc-500 rounded-lg text-xs font-medium cursor-default">
+                            <BadgeDollarSign className="w-3 h-3" />
+                            Refund Requested ✓
+                          </span>
+                        ) : (
+                          <button
+                            onClick={() => handleRequestRefund(order.id, order.order_number)}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-600/20 hover:bg-amber-600/40 border border-amber-500/30 text-amber-400 hover:text-amber-300 rounded-lg transition-all text-xs font-medium"
+                          >
+                            <BadgeDollarSign className="w-3 h-3" />
+                            Request Refund
+                          </button>
+                        )
+                      )}
+
+                      {/* Request Replacement — delivered only */}
+                      {order.status === 'delivered' && (
+                        order.replacement_requested ? (
+                          <span className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 border border-white/10 text-zinc-500 rounded-lg text-xs font-medium cursor-default">
+                            <RefreshCcw className="w-3 h-3" />
+                            Replacement Requested ✓
+                          </span>
+                        ) : (
+                          <button
+                            onClick={() => handleRequestReplacement(order.id, order.order_number)}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/30 text-blue-400 hover:text-blue-300 rounded-lg transition-all text-xs font-medium"
+                          >
+                            <RefreshCcw className="w-3 h-3" />
+                            Request Replacement
+                          </button>
+                        )
+                      )}
+
+                      {/* Re-order */}
                       {order.status !== 'cancelled' && (
                         <button
                           onClick={() => handleReorder(order)}
