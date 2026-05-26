@@ -8,6 +8,7 @@ import ActivityTicker from '@/components/home/ActivityTicker'
 import RecommendedCombo from '@/components/home/RecommendedCombo'
 import CategoryRow from '@/components/home/CategoryRow'
 import TopSellers from '@/components/home/TopSellers'
+import SectionSwitch from '@/components/home/SectionSwitch'
 import PromoBanners from '@/components/home/PromoBanners'
 import ReviewsSection from '@/components/home/ReviewsSection'
 import FAQSection from '@/components/home/FAQSection'
@@ -50,8 +51,7 @@ export default async function HomePage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 pb-16 sm:pb-20">
         <CategoryRow />
-        <HeroBanner plans={featured} banners={[]} discountedPlans={discounted} />
-        <TopSellers plans={plans} />
+        <SectionSwitch featured={featured} discountedPlans={discounted} plans={plans} />
         <PromoBanners />
 
         <RecommendedCombo plans={plans} />
