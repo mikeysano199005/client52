@@ -4,7 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase'
 import Link from 'next/link'
 import {
   ShoppingBag, Wallet, Users, Copy, ExternalLink,
-  TrendingUp, Clock, CheckCircle, Package, LogOut, Headphones
+  TrendingUp, Clock, CheckCircle, Package, LogOut, Headphones, ChevronLeft
 } from 'lucide-react'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
@@ -39,10 +39,21 @@ export default async function DashboardPage() {
       <main className="max-w-6xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-16 sm:pb-20">
         {/* Welcome */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-white">
-            Welcome back, <span className="gradient-text">{user.name.split(' ')[0]}</span> 👋
-          </h1>
-          <p className="text-zinc-500 text-sm mt-1">Manage your subscriptions and account</p>
+          <div className="flex items-center gap-3 mb-3">
+            <Link
+              href="/"
+              className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-purple-500/40 text-zinc-400 hover:text-white transition-all shrink-0"
+              aria-label="Back to main page"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </Link>
+            <div>
+              <h1 className="text-2xl font-bold text-white">
+                Welcome back, <span className="gradient-text">{user.name.split(' ')[0]}</span> 👋
+              </h1>
+              <p className="text-zinc-500 text-sm mt-0.5">Manage your subscriptions and account</p>
+            </div>
+          </div>
         </div>
 
         {/* Stats */}

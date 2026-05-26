@@ -1,8 +1,8 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
-  Search, X, CheckCircle, Package, User, Eye, EyeOff, ChevronRight
+  Search, X, CheckCircle, Package, User, Eye, EyeOff, ChevronRight, ChevronDown
 } from 'lucide-react'
 import { formatPrice, formatDateTime, ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '@/lib/utils'
 import type { Order } from '@/types'
@@ -26,8 +26,15 @@ type OrderWithAccount = Order & {
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<OrderWithAccount[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [total, setTotal] = useState(0)
+  const [hasMore, setHasMore] = useState(false)
+  const [page, setPage] = useState(1)
+
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+
   const [selected, setSelected] = useState<OrderWithAccount | null>(null)
   const [adminNotes, setAdminNotes] = useState('')
   const [updating, setUpdating] = useState(false)
@@ -40,13 +47,53 @@ export default function AdminOrdersPage() {
   const [pickedAccount, setPickedAccount] = useState<StockAccount | null>(null)
   const [showPw, setShowPw] = useState<Record<string, boolean>>({})
 
-  useEffect(() => { loadOrders() }, [])
+  // Debounce search input
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search), 400)
+    return () => clearTimeout(t)
+  }, [search])
 
-  async function loadOrders() {
-    setLoading(true)
-    const res = await fetch('/api/admin/orders')
-    if (res.ok) { const { orders } = await res.json(); setOrders(orders) }
-    setLoading(false)
+  // Reload from page 1 when filters change
+  const filterRef = useRef({ search: debouncedSearch, status: statusFilter })
+  useEffect(() => {
+    filterRef.current = { search: debouncedSearch, status: statusFilter }
+    setPage(1)
+    setHasMore(false)
+    fetchOrders(1, debouncedSearch, statusFilter, false)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch, statusFilter])
+
+  async function fetchOrders(pageNum: number, srch: string, status: string, append: boolean) {
+    if (!append) setLoading(true)
+    else setLoadingMore(true)
+
+    const params = new URLSearchParams({ page: String(pageNum) })
+    if (status && status !== 'all') params.set('status', status)
+    if (srch) params.set('search', srch)
+
+    const res = await fetch(`/api/admin/orders?${params}`)
+    if (res.ok) {
+      const { orders: newOrders, total: t, hasMore: more } = await res.json()
+      setOrders(prev => append ? [...prev, ...newOrders] : newOrders)
+      setTotal(t)
+      setHasMore(more)
+    }
+
+    if (!append) setLoading(false)
+    else setLoadingMore(false)
+  }
+
+  async function loadMore() {
+    const next = page + 1
+    setPage(next)
+    await fetchOrders(next, filterRef.current.search, filterRef.current.status, true)
+  }
+
+  // Refresh from page 1 with current filters (called after order updates)
+  async function refreshOrders() {
+    setPage(1)
+    setHasMore(false)
+    await fetchOrders(1, filterRef.current.search, filterRef.current.status, false)
   }
 
   function openModal(order: OrderWithAccount) {
@@ -98,7 +145,7 @@ export default function AdminOrdersPage() {
     })
     if (res.ok) {
       toast.success(redeliverMode ? 'Credentials reassigned & resent!' : 'Order delivered! Credentials sent to customer.')
-      await loadOrders()
+      await refreshOrders()
       closeModal()
     } else {
       const d = await res.json()
@@ -117,17 +164,11 @@ export default function AdminOrdersPage() {
     })
     if (res.ok) {
       toast.success('Order updated!')
-      await loadOrders()
+      await refreshOrders()
       closeModal()
     } else toast.error('Failed to update')
     setUpdating(false)
   }
-
-  const filtered = orders.filter((o) => {
-    const matchSearch = !search || o.order_number.includes(search.toUpperCase()) || o.plan_name.toLowerCase().includes(search.toLowerCase())
-    const matchStatus = statusFilter === 'all' || o.status === statusFilter
-    return matchSearch && matchStatus
-  })
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
@@ -148,7 +189,7 @@ export default function AdminOrdersPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
         {[
-          { label: 'Total', value: orders.length, color: 'text-white' },
+          { label: 'Total', value: total, color: 'text-white' },
           { label: 'Pending', value: orders.filter(o => ['payment_submitted','under_verification','processing'].includes(o.status)).length, color: 'text-amber-400' },
           { label: 'Delivered', value: orders.filter(o => o.status === 'delivered').length, color: 'text-green-400' },
           { label: 'Revenue', value: formatPrice(orders.filter(o => o.status === 'delivered').reduce((s, o) => s + Number(o.amount), 0)), color: 'text-purple-400' },
@@ -178,10 +219,10 @@ export default function AdminOrdersPage() {
                     <td key={j} className="px-4 py-4"><div className="h-4 skeleton rounded" /></td>
                   ))}</tr>
                 ))
-              ) : filtered.length === 0 ? (
+              ) : orders.length === 0 ? (
                 <tr><td colSpan={6} className="px-4 py-12 text-center text-zinc-500">No orders found</td></tr>
               ) : (
-                filtered.map((order: OrderWithAccount) => (
+                orders.map((order: OrderWithAccount) => (
                   <tr key={order.id} className="hover:bg-white/5 transition-colors">
                     <td className="px-4 py-3 text-xs font-mono text-zinc-400">#{order.order_number}</td>
                     <td className="px-4 py-3">
@@ -207,6 +248,27 @@ export default function AdminOrdersPage() {
             </tbody>
           </table>
         </div>
+
+        {/* Load More */}
+        {hasMore && (
+          <div className="px-4 py-4 border-t border-white/5 text-center">
+            <button
+              onClick={loadMore}
+              disabled={loadingMore}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300 text-sm rounded-xl transition-all disabled:opacity-50"
+            >
+              {loadingMore
+                ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Loading...</>
+                : <><ChevronDown className="w-4 h-4" /> Load More</>}
+            </button>
+            <p className="text-xs text-zinc-600 mt-2">Showing {orders.length} of {total} orders</p>
+          </div>
+        )}
+        {!hasMore && !loading && orders.length > 0 && (
+          <p className="px-4 py-3 text-xs text-zinc-600 text-center border-t border-white/5">
+            Showing all {orders.length} order{orders.length !== 1 ? 's' : ''}
+          </p>
+        )}
       </div>
 
       {/* Order Detail Modal */}

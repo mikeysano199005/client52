@@ -1,6 +1,6 @@
 'use client'
-import { useState, useEffect } from 'react'
-import { Search, Users, Wallet, Ban, CheckCircle, X } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { Search, Users, Wallet, Ban, CheckCircle, X, ChevronDown } from 'lucide-react'
 import { formatPrice, formatDate } from '@/lib/utils'
 import type { User } from '@/types'
 import toast from 'react-hot-toast'
@@ -9,19 +9,63 @@ import { motion, AnimatePresence } from 'framer-motion'
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [total, setTotal] = useState(0)
+  const [hasMore, setHasMore] = useState(false)
+  const [page, setPage] = useState(1)
+
   const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+
   const [selected, setSelected] = useState<User | null>(null)
   const [walletAmount, setWalletAmount] = useState('')
   const [walletReason, setWalletReason] = useState('Admin credit')
   const [saving, setSaving] = useState(false)
 
-  useEffect(() => { loadUsers() }, [])
+  // Debounce search
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search), 400)
+    return () => clearTimeout(t)
+  }, [search])
 
-  async function loadUsers() {
-    setLoading(true)
-    const res = await fetch('/api/admin/users')
-    if (res.ok) { const { users } = await res.json(); setUsers(users) }
-    setLoading(false)
+  const searchRef = useRef(debouncedSearch)
+  useEffect(() => {
+    searchRef.current = debouncedSearch
+    setPage(1)
+    setHasMore(false)
+    fetchUsers(1, debouncedSearch, false)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch])
+
+  async function fetchUsers(pageNum: number, srch: string, append: boolean) {
+    if (!append) setLoading(true)
+    else setLoadingMore(true)
+
+    const params = new URLSearchParams({ page: String(pageNum) })
+    if (srch) params.set('search', srch)
+
+    const res = await fetch(`/api/admin/users?${params}`)
+    if (res.ok) {
+      const { users: newUsers, total: t, hasMore: more } = await res.json()
+      setUsers(prev => append ? [...prev, ...newUsers] : newUsers)
+      setTotal(t)
+      setHasMore(more)
+    }
+
+    if (!append) setLoading(false)
+    else setLoadingMore(false)
+  }
+
+  async function loadMore() {
+    const next = page + 1
+    setPage(next)
+    await fetchUsers(next, searchRef.current, true)
+  }
+
+  async function refreshUsers() {
+    setPage(1)
+    setHasMore(false)
+    await fetchUsers(1, searchRef.current, false)
   }
 
   async function toggleActive(user: User) {
@@ -30,7 +74,7 @@ export default function AdminUsersPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ active: !user.active }),
     })
-    if (res.ok) { toast.success(`User ${user.active ? 'disabled' : 'enabled'}`); await loadUsers() }
+    if (res.ok) { toast.success(`User ${user.active ? 'disabled' : 'enabled'}`); await refreshUsers() }
   }
 
   async function addWallet() {
@@ -49,22 +93,18 @@ export default function AdminUsersPage() {
       toast.success(`₹${walletAmount} added! New balance: ₹${new_balance}`)
       setSelected(null)
       setWalletAmount('')
-      await loadUsers()
+      await refreshUsers()
     } else {
       toast.error('Failed to add wallet')
     }
     setSaving(false)
   }
 
-  const filtered = users.filter((u) =>
-    !search || u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase())
-  )
-
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       <h1 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
         <Users className="w-6 h-6 text-purple-400" />
-        Users ({users.length})
+        Users ({total})
       </h1>
 
       <div className="glass rounded-xl p-4 mb-5">
@@ -94,10 +134,10 @@ export default function AdminUsersPage() {
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i}>{Array.from({ length: 7 }).map((_, j) => <td key={j} className="px-4 py-4"><div className="h-4 skeleton rounded" /></td>)}</tr>
                 ))
-              ) : filtered.length === 0 ? (
+              ) : users.length === 0 ? (
                 <tr><td colSpan={7} className="px-4 py-12 text-center text-zinc-500">No users found</td></tr>
               ) : (
-                filtered.map((user) => (
+                users.map((user) => (
                   <tr key={user.id} className="hover:bg-white/5 transition-colors">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
@@ -140,6 +180,27 @@ export default function AdminUsersPage() {
             </tbody>
           </table>
         </div>
+
+        {/* Load More */}
+        {hasMore && (
+          <div className="px-4 py-4 border-t border-white/5 text-center">
+            <button
+              onClick={loadMore}
+              disabled={loadingMore}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300 text-sm rounded-xl transition-all disabled:opacity-50"
+            >
+              {loadingMore
+                ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Loading...</>
+                : <><ChevronDown className="w-4 h-4" /> Load More</>}
+            </button>
+            <p className="text-xs text-zinc-600 mt-2">Showing {users.length} of {total} users</p>
+          </div>
+        )}
+        {!hasMore && !loading && users.length > 0 && (
+          <p className="px-4 py-3 text-xs text-zinc-600 text-center border-t border-white/5">
+            Showing all {users.length} user{users.length !== 1 ? 's' : ''}
+          </p>
+        )}
       </div>
 
       {/* Add Wallet Modal */}
