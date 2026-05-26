@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Package, ChevronLeft, RefreshCw, Copy, Eye, EyeOff, RotateCcw } from 'lucide-react'
+import { Package, ChevronLeft, RefreshCw, Copy, Eye, EyeOff, RotateCcw, XCircle } from 'lucide-react'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import SupportWidget from '@/components/support/SupportWidget'
@@ -87,6 +87,22 @@ export default function OrdersPage() {
   function copyText(text: string, label: string) {
     navigator.clipboard.writeText(text)
     toast.success(`${label} copied!`)
+  }
+
+  async function handleCancelOrder(orderId: string, orderNumber: string, walletUsed: number) {
+    if (!confirm(`Cancel order #${orderNumber}?${walletUsed > 0 ? `\n₹${walletUsed} wallet balance will be refunded.` : ''}`)) return
+    const res = await fetch(`/api/orders/${orderId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'cancel' }),
+    })
+    if (res.ok) {
+      toast.success(walletUsed > 0 ? `Order cancelled. ₹${walletUsed} refunded to wallet.` : 'Order cancelled.')
+      fetchOrders(true)
+    } else {
+      const { error } = await res.json()
+      toast.error(error || 'Failed to cancel order')
+    }
   }
 
   async function handleReorder(order: FullOrder) {
@@ -296,15 +312,26 @@ export default function OrdersPage() {
                   {/* Footer */}
                   <div className="px-5 py-3 flex items-center justify-between text-xs text-zinc-500">
                     <span>Plan: {(order.plan_variant as { label?: string })?.label || '—'} • Wallet used: {formatPrice(order.wallet_used)}</span>
-                    {order.status !== 'cancelled' && (
-                      <button
-                        onClick={() => handleReorder(order)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-600/20 hover:bg-purple-600/40 border border-purple-500/30 text-purple-400 hover:text-purple-300 rounded-lg transition-all text-xs font-medium"
-                      >
-                        <RotateCcw className="w-3 h-3" />
-                        Re-order
-                      </button>
-                    )}
+                    <div className="flex items-center gap-2">
+                      {order.status === 'payment_submitted' && (
+                        <button
+                          onClick={() => handleCancelOrder(order.id, order.order_number, order.wallet_used)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 bg-red-600/20 hover:bg-red-600/40 border border-red-500/30 text-red-400 hover:text-red-300 rounded-lg transition-all text-xs font-medium"
+                        >
+                          <XCircle className="w-3 h-3" />
+                          Cancel Order
+                        </button>
+                      )}
+                      {order.status !== 'cancelled' && (
+                        <button
+                          onClick={() => handleReorder(order)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-600/20 hover:bg-purple-600/40 border border-purple-500/30 text-purple-400 hover:text-purple-300 rounded-lg transition-all text-xs font-medium"
+                        >
+                          <RotateCcw className="w-3 h-3" />
+                          Re-order
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               )

@@ -10,7 +10,7 @@ export async function PATCH(
   try {
     await requireAdmin()
     const { id } = await params
-    const { status, admin_notes, account_id: explicitAccountId, force_reassign } = await req.json()
+    const { status, admin_notes, account_id: explicitAccountId, force_reassign, action } = await req.json()
 
     // Get the current order
     const { data: order } = await supabaseAdmin
@@ -20,6 +20,48 @@ export async function PATCH(
       .single()
 
     if (!order) return Response.json({ error: 'Order not found' }, { status: 404 })
+
+    // ── Refund action ──
+    if (action === 'refund') {
+      const { data: userData } = await supabaseAdmin
+        .from('users')
+        .select('wallet_balance')
+        .eq('id', order.user_id)
+        .single()
+
+      if (userData) {
+        const refundAmount = Number(order.amount)
+        const newBalance = (userData.wallet_balance || 0) + refundAmount
+        await supabaseAdmin.from('users').update({ wallet_balance: newBalance }).eq('id', order.user_id)
+        await supabaseAdmin.from('wallet_transactions').insert({
+          user_id: order.user_id,
+          type: 'credit',
+          amount: refundAmount,
+          reason: `Admin refund for order #${order.order_number}`,
+          reference_id: id,
+        })
+      }
+
+      const { data: refunded, error: refundError } = await supabaseAdmin
+        .from('orders')
+        .update({
+          status: 'cancelled',
+          admin_notes: admin_notes || 'Refunded by admin',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id)
+        .select()
+        .single()
+
+      if (refundError) return Response.json({ error: refundError.message }, { status: 500 })
+
+      if (order.users) {
+        sendOrderCancelled(refunded, order.users.email, order.users.name, 'Refunded by admin').catch(() => null)
+        notifyOrderStatusChange(refunded, order.users.name).catch(() => null)
+      }
+
+      return Response.json({ order: refunded, refunded: true })
+    }
 
     // If delivering, use explicit account_id (admin picked) or auto-assign
     let accountId = order.account_id

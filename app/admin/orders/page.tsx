@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
-  Search, X, CheckCircle, Package, User, Eye, EyeOff, ChevronRight, ChevronDown
+  Search, X, CheckCircle, Package, User, Eye, EyeOff, ChevronRight, ChevronDown, RotateCcw
 } from 'lucide-react'
 import { formatPrice, formatDateTime, ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '@/lib/utils'
 import type { Order } from '@/types'
@@ -150,6 +150,26 @@ export default function AdminOrdersPage() {
     } else {
       const d = await res.json()
       toast.error(d.error || 'Failed to deliver')
+    }
+    setUpdating(false)
+  }
+
+  async function handleRefund() {
+    if (!selected) return
+    if (!confirm(`Refund ₹${selected.amount} to customer wallet and cancel this order?`)) return
+    setUpdating(true)
+    const res = await fetch(`/api/admin/orders/${selected.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'refund', admin_notes: adminNotes }),
+    })
+    if (res.ok) {
+      toast.success(`₹${selected.amount} refunded to wallet. Order cancelled.`)
+      await refreshOrders()
+      closeModal()
+    } else {
+      const d = await res.json()
+      toast.error(d.error || 'Refund failed')
     }
     setUpdating(false)
   }
@@ -472,6 +492,21 @@ export default function AdminOrdersPage() {
                         Cancelled
                       </button>
                     </div>
+                  </div>
+                )}
+
+                {/* ── Refund & Cancel ── */}
+                {selected.status !== 'cancelled' && !deliverStep && (
+                  <div className="border-t border-white/10 pt-4">
+                    <p className="text-zinc-500 text-xs mb-2">Danger Zone</p>
+                    <button
+                      onClick={handleRefund}
+                      disabled={updating}
+                      className="w-full py-2 border border-red-500/30 text-red-400 hover:bg-red-600/20 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-1.5 disabled:opacity-50"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      Refund ₹{selected.amount} to Wallet &amp; Cancel
+                    </button>
                   </div>
                 )}
               </div>

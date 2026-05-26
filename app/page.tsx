@@ -49,8 +49,8 @@ export default async function HomePage() {
       <div className="pt-14 lg:pt-16"><ActivityTicker /></div>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 pb-16 sm:pb-20">
-        <HeroBanner plans={featured} banners={[]} discountedPlans={discounted} />
         <CategoryRow />
+        <HeroBanner plans={featured} banners={[]} discountedPlans={discounted} />
         <TopSellers plans={plans} />
         <PromoBanners />
 
