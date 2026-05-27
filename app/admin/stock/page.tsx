@@ -158,6 +158,7 @@ export default function AdminStockPage() {
       body: JSON.stringify({ id }),
     })
     if (res.ok) { toast.success('Deleted'); await refreshStock() }
+    else { const d = await res.json(); toast.error(d.error || 'Failed to delete') }
   }
 
   async function updateStockStatus(id: string, status: string) {
@@ -300,11 +301,9 @@ export default function AdminStockPage() {
                             <RotateCcw className="w-3.5 h-3.5" />
                           </button>
                         )}
-                        {item.status === 'available' && (
-                          <button onClick={() => deleteStock(item.id)} className="p-1.5 text-zinc-600 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all">
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        )}
+                        <button onClick={() => deleteStock(item.id)} className="p-1.5 text-zinc-600 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     </td>
                   </tr>

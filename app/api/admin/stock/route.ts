@@ -89,8 +89,27 @@ export async function DELETE(req: Request) {
   try {
     await requireAdmin()
     const { id } = await req.json()
+
+    // Fetch the item first so we can update plan stock_count after
+    const { data: item } = await supabaseAdmin
+      .from('account_stock')
+      .select('plan_id, status')
+      .eq('id', id)
+      .single()
+
     const { error } = await supabaseAdmin.from('account_stock').delete().eq('id', id)
     if (error) return Response.json({ error: error.message }, { status: 500 })
+
+    // Recalculate available stock for the plan
+    if (item?.plan_id) {
+      const { count } = await supabaseAdmin
+        .from('account_stock')
+        .select('id', { count: 'exact', head: true })
+        .eq('plan_id', item.plan_id)
+        .eq('status', 'available')
+      await supabaseAdmin.from('plans').update({ stock_count: count || 0 }).eq('id', item.plan_id)
+    }
+
     return Response.json({ success: true })
   } catch {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
